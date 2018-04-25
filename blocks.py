@@ -12,12 +12,14 @@ def init(data):
     data.movingBlocks = []
     data.bottomBlocks = []
     data.stoppedBlocks = []
+    data.stacks = []
     data.count = 0
-    data.timerDelay = 300
+    data.timerDelay = 30
     data.firstState = True
     data.levelState = False
     data.instructionBlockState = False
     data.gameBlockState = False
+    data.game2BlockState = False
     data.winBlockState = False
     data.loseBlockState = False
     data.randomBlocks = []
@@ -30,6 +32,14 @@ def init(data):
     data.currBlock = None
     data.nowBlock = None
     data.score = 0
+    #example of falling block
+    data.misplacedBlock = [data.width//2-150,data.height//2-110,
+    data.width//2-150+40,data.height//2-110,
+    data.width//2-150+40,data.height//2-70,
+    data.width//2-150,data.height//2-70,"red"]
+    #example of well balanced block
+    data.wellplacedBlock = [data.width//2+20,data.height//2-170,
+    data.width//2+60,data.height//2-170+40,"lightsalmon"]
  
 #randomly generates new blocks of different sizes at the top of the board
 def createBlock(data):
@@ -99,7 +109,7 @@ def mousePressed(event, data):
         data.width-data.margin-20:
             if data.height//2 <= y <= data.height//2+100:
                 data.levelState = False
-                data.gameBlockState = True
+                data.game2BlockState = True
     if data.instructionBlockState:
         #if the user clicks on the "Continue" button, continue to the game
         if (data.width//2 - data.buttonWidth//2 <= x <= \
@@ -171,18 +181,62 @@ def keyPressed(event, data):
 def timerFired(data):
     if data.firstState:
         #generates random blocks around the screen
-        if data.count%2 == 0:
+        if data.count%12 == 0:
             randomBlocks(data)
         data.count += 1
+    if data.instructionBlockState:
+        #shows misplaced block falling
+        moveMisplacedBlock(data)
+        movePlacedBlock(data)
     if data.gameBlockState:
         #creates a new block at the top of the screen every 10 seconds
-        if data.count%10 == 0:
+        if data.count%60 == 0:
             createBlock(data)
         #every second each moving block moves down on the screen
-        if data.count > 0:
+        if data.count > 0 and data.count%6 == 0:
             for block in data.movingBlocks:
                 moveBlock(data, block)
+        data.tipCount = 0
+        if data.nowBlock != None:
+            moveTippedBlock(data)
+            data.tipCount += 1
         data.count += 1
+        
+def moveMisplacedBlock(data):
+    if data.misplacedBlock[5] < data.height//2-30:
+        data.misplacedBlock[1] += 1
+        data.misplacedBlock[3] += 1
+        data.misplacedBlock[5] += 1
+        data.misplacedBlock[7] += 1
+    elif data.misplacedBlock[1] >= 330 or data.misplacedBlock[3] >= 330 or \
+    data.misplacedBlock[5] >= 330 or data.misplacedBlock[7] >= 330:
+        data.misplacedBlock[0] = data.width//2-150
+        data.misplacedBlock[1] = data.height//2-110
+        data.misplacedBlock[2] = data.width//2-150+40
+        data.misplacedBlock[3] = data.height//2-110
+        data.misplacedBlock[4] = data.width//2-150+40
+        data.misplacedBlock[5] = data.height//2-70
+        data.misplacedBlock[6] = data.width//2-150
+        data.misplacedBlock[7] = data.height//2-70
+    else:
+        data.misplacedBlock[0] -= 1
+        data.misplacedBlock[1] += 1
+        data.misplacedBlock[2] -= 1
+        data.misplacedBlock[3] += 0.5
+        data.misplacedBlock[4] -= 0.5
+        data.misplacedBlock[5] += 0.5
+        data.misplacedBlock[6] -= 0.5
+        data.misplacedBlock[7] += 1
+        
+def movePlacedBlock(data):
+    if data.wellplacedBlock[3] < data.height//2-70:
+        data.wellplacedBlock[1] += 1
+        data.wellplacedBlock[3] += 1
+    else:
+        data.wellplacedBlock[0] = data.width//2+20
+        data.wellplacedBlock[1] = data.height//2-170
+        data.wellplacedBlock[2] = data.width//2+60
+        data.wellplacedBlock[3] = data.height//2-170+40
         
 def moveBlock(data, block, positionShift = 10):
     blockSize = block[2] - block[0]
@@ -195,10 +249,11 @@ def moveBlock(data, block, positionShift = 10):
         #reset the clicked block to none if it reaches the bottom
         if data.currBlock == block:
             data.currBlock = None
-        elif data.nowBlock == block:
-            data.gameBlockState = False
-            data.loseBlockState = True
+        # elif data.nowBlock == block:
+        #     data.gameBlockState = False
+        #     data.loseBlockState = True
         data.bottomBlocks.append(block)
+        data.stacks.append([block])
         data.score += 1
         data.movingBlocks.remove(block)
     else:
@@ -212,7 +267,8 @@ def moveBlock(data, block, positionShift = 10):
                     block[3] = stoppedBlock[1]
                     #reset the clicked block to none if it reaches a stopped
                     #block
-                    data.nowBlock = block
+                    data.nowBlock =  [block[0],block[1],block[2],block[1],
+                    block[2],block[3],block[0],block[3]]
                     if data.currBlock == block:
                         data.currBlock = None
                     if isBalanced(data, data.nowBlock, stoppedBlock):
@@ -222,8 +278,11 @@ def moveBlock(data, block, positionShift = 10):
                         data.movingBlocks.remove(block)
                         continue
                     else:
-                        data.nowBlock[4] = "red"
-                        moveTippedBlock(data)
+                        # data.nowBlock = [data.nowBlock[0],data.nowBlock[1],
+                        # data.nowBlock[2],data.nowBlock[1],data.nowBlock[2],
+                        # data.nowBlock[3],data.nowBlock[0],data.nowBlock[3],
+                        # data.nowBlock[-1]]
+                        data.movingBlocks.remove(block)
             elif block[3] > stoppedBlock[1]:
                 if stoppedBlock[0] < block[0] < stoppedBlock[2] or \
                 stoppedBlock[0] < block[2] < stoppedBlock[2]:
@@ -232,7 +291,8 @@ def moveBlock(data, block, positionShift = 10):
                     block[3] = stoppedBlock[1]
                     #reset the clicked block to none if it reaches a stopped
                     #block
-                    data.nowBlock = block
+                    data.nowBlock =  [block[0],block[1],block[2],block[1],
+                    block[2],block[3],block[0],block[3]]
                     if data.currBlock == block:
                         data.currBlock = None
                     if isBalanced(data, data.nowBlock, stoppedBlock):
@@ -241,8 +301,11 @@ def moveBlock(data, block, positionShift = 10):
                         data.score += 1
                         data.movingBlocks.remove(block)
                     else:
-                        data.nowBlock[4] = "red"
-                        moveTippedBlock(data)
+                        # data.nowBlock = [data.nowBlock[0],data.nowBlock[1],
+                        # data.nowBlock[2],data.nowBlock[1],data.nowBlock[2],
+                        # data.nowBlock[3],data.nowBlock[0],data.nowBlock[3],
+                        # data.nowBlock[-1]]
+                        data.movingBlocks.remove(block)
             else:
                 pass
         #checks if the moving block has collided with a bottom block
@@ -255,7 +318,8 @@ def moveBlock(data, block, positionShift = 10):
                     block[3] = bottomBlock[1]
                     #reset the clicked block to none if it reaches a bottom
                     #block
-                    data.nowBlock = block
+                    data.nowBlock =  [block[0],block[1],block[2],block[1],
+                    block[2],block[3],block[0],block[3]]
                     if data.currBlock == block:
                         data.currBlock = None
                     if isBalanced(data, data.nowBlock, bottomBlock):
@@ -265,8 +329,11 @@ def moveBlock(data, block, positionShift = 10):
                         data.movingBlocks.remove(block)
                         continue
                     else:
-                        data.nowBlock[4] = "red"
-                        moveTippedBlock(data)
+                        # data.nowBlock = [data.nowBlock[0],data.nowBlock[1],
+                        # data.nowBlock[2],data.nowBlock[1],data.nowBlock[2],
+                        # data.nowBlock[3],data.nowBlock[0],data.nowBlock[3],
+                        # data.nowBlock[-1]]
+                        data.movingBlocks.remove(block)
             elif block[3] > bottomBlock[1]:
                 if bottomBlock[0] < block[0] < bottomBlock[2] or \
                 bottomBlock[0] < block[2] < bottomBlock[2]:
@@ -275,7 +342,8 @@ def moveBlock(data, block, positionShift = 10):
                     block[3] = bottomBlock[1]
                     #reset the clicked block to none if it reaches a bottom
                     #block
-                    data.nowBlock = block
+                    data.nowBlock = [block[0],block[1],block[2],block[1],
+                    block[2],block[3],block[0],block[3]]
                     if data.currBlock == block:
                         data.currBlock = None
                     if isBalanced(data, data.nowBlock, bottomBlock):
@@ -285,26 +353,68 @@ def moveBlock(data, block, positionShift = 10):
                         data.movingBlocks.remove(block)
                         continue
                     else:
-                        data.nowBlock[4] = "red"
-                        moveTippedBlock(data)
+                        # data.nowBlock = [data.nowBlock[0],data.nowBlock[1],
+                        # data.nowBlock[2],data.nowBlock[1],data.nowBlock[2],
+                        # data.nowBlock[3],data.nowBlock[0],data.nowBlock[3],
+                        # data.nowBlock[-1]]
+                        data.movingBlocks.remove(block)
             else:
                 pass
                 
 def moveTippedBlock(data):
-    if data.nowBlock[5] == "right":
-        data.nowBlock[0] += data.positionShift
-        data.nowBlock[2] += data.positionShift
-        data.nowBlock[1] += data.positionShift
-        data.nowBlock[3] += data.positionShift
-        if data.nowBlock[3] >= data.height - data.margin:
+    print(data.nowBlock[-1])
+    if data.nowBlock[-1] == "right":
+        print(data.nowBlock)
+        if data.tipCount%2 == 0:
+            data.nowBlock[0] += 1
+            data.nowBlock[1] += 0.5
+            data.nowBlock[2] += 1
+            data.nowBlock[3] += 1
+            data.nowBlock[4] += 0.5
+            data.nowBlock[5] += 1
+            data.nowBlock[6] += 0.5
+            data.nowBlock[7] += 0.5
+        else:
+            data.nowBlock[0] += 0.5
+            data.nowBlock[1] += 1
+            data.nowBlock[2] += 0.5
+            data.nowBlock[3] += 0.5
+            data.nowBlock[4] += 1
+            data.nowBlock[5] += 0.5
+            data.nowBlock[6] += 1
+            data.nowBlock[7] += 1
+        #if the block hits the bottom, player loses
+        if data.nowBlock[1] >= data.height - data.margin or \
+        data.nowBlock[3] >= data.height - data.margin or \
+        data.nowBlock[5] >= data.height - data.margin or \
+        data.nowBlock[7] >= data.height - data.margin:
             data.gameBlockState = False
             data.loseBlockState = True
-    elif data.nowBlock[5] == "left":
-        data.nowBlock[0] -= data.positionShift
-        data.nowBlock[2] -= data.positionShift
-        data.nowBlock[1] += data.positionShift
-        data.nowBlock[3] += data.positionShift
-        if data.nowBlock[3] >= data.height - data.margin:
+    elif data.nowBlock[-1] == "left":
+        print("left")
+        if data.tipCount%2 == 0:
+            data.nowBlock[0] -= 1
+            data.nowBlock[1] += 1
+            data.nowBlock[2] -= 1
+            data.nowBlock[3] += 0.5
+            data.nowBlock[4] -= 0.5
+            data.nowBlock[5] += 0.5
+            data.nowBlock[6] -= 0.5
+            data.nowBlock[7] += 1
+        else:
+            data.nowBlock[0] -= 0.5
+            data.nowBlock[1] += 0.5
+            data.nowBlock[2] -= 0.5
+            data.nowBlock[3] += 1
+            data.nowBlock[4] -= 1
+            data.nowBlock[5] += 1
+            data.nowBlock[6] -= 1
+            data.nowBlock[7] += 0.5
+        #if the block hits the bottom, player loses
+        if data.nowBlock[1] >= data.height - data.margin or \
+        data.nowBlock[3] >= data.height - data.margin or \
+        data.nowBlock[5] >= data.height - data.margin or \
+        data.nowBlock[7] >= data.height - data.margin:
             data.gameBlockState = False
             data.loseBlockState = True
 
@@ -326,26 +436,43 @@ def isBalanced(data, fallingBlock, placedBlock):
     fallingBlockCenter = fallingBlock[0] + fallingBlockSize
     placedBlockSize = placedBlock[2] - placedBlock[0]
     placedBlockCenter = placedBlock[0] + placedBlockSize
-    #checks if the centers of the two blocks are further away from each other
-    #than half of the size of the block on top
+    #if block is off the right side of the underlying block by more than
+    #half of its size
     if fallingBlockCenter - placedBlockCenter > fallingBlockSize//2:
         data.nowBlock.append("right")
+        print(data.nowBlock,1)
         return False
+    #if block is off the left side of the underlying block by more than
+    #half of its size
     elif placedBlockCenter - fallingBlockCenter > fallingBlockSize//2:
         data.nowBlock.append("left")
+        print(data.nowBlock,2)
         return False
     else:
-        return True
+        #if block will cause tower to lean left but not fall
+        if placedBlockCenter - fallingBlockCenter > fallingBlockSize//4:
+            data.nowBlock.append("littleleft")
+            print(data.nowBlock,3)
+            return True
+        #if block will cause tower to lean right but not fall
+        elif fallingBlockCenter - placedBlockCenter > fallingBlockSize//4:
+            data.nowBlock.append("littleright")
+            print(data.nowBlock,4)
+            return True
+        else:
+            return True
     
 def redrawAll(canvas, data):
     #draws background
     canvas.create_rectangle(data.margin, data.margin, data.width-data.margin,
     data.height - data.margin, fill="lightcyan")
+    # img = PhotoImage(file="city.gif")      
+    # canvas.create_image(20,20, anchor=NW, image=img) 
     if data.firstState:
         #draws centered white square and text with instructions
         canvas.create_rectangle(data.starterx1,data.startery1,data.starterx2,
         data.startery2,fill="white",outline="black")
-        if data.count < 9:
+        if data.count < 54:
             canvas.create_text(data.width//2,data.height//2-20,
             text="Welcome to",font="Arial 35 bold",
             fill="lightsalmon")
@@ -398,9 +525,10 @@ def redrawAll(canvas, data):
         canvas.create_rectangle(data.width//2-120,data.height//2-30,
         data.width//2-120+block2Size,data.height//2+50,
         fill="lightsalmon")
-        canvas.create_rectangle(data.width//2-150,data.height//2-70,
-        data.width//2-150+block3Size,data.height//2-30,
-        fill="red")
+        canvas.create_polygon(data.misplacedBlock[0],data.misplacedBlock[1],
+        data.misplacedBlock[2],data.misplacedBlock[3],data.misplacedBlock[4],
+        data.misplacedBlock[5],data.misplacedBlock[6],data.misplacedBlock[7],
+        fill=data.misplacedBlock[8])
         #draws the example of well stacked blocks
         canvas.create_text(data.width//2+130,data.margin+110,
         text="Example of blocks that",font="Arial 17")
@@ -412,9 +540,9 @@ def redrawAll(canvas, data):
         canvas.create_rectangle(data.width//2+20,data.height//2-70,
         data.width//2+20+block2Size,data.height//2-70+block2Size,
         fill="lightsalmon")
-        canvas.create_rectangle(data.width//2+20,data.height//2-110,
-        data.width//2+20+block3Size,data.height//2-110+block3Size,
-        fill="lightsalmon")
+        canvas.create_rectangle(data.wellplacedBlock[0],
+        data.wellplacedBlock[1],data.wellplacedBlock[2],
+        data.wellplacedBlock[3],fill=data.wellplacedBlock[4])
         spaceBelow = 3/4
         #draws instructions on how to move the blocks
         canvas.create_text(data.width//2,data.height*spaceBelow,
@@ -434,6 +562,14 @@ def redrawAll(canvas, data):
         data.height-data.spaceAbove-data.buttonHeight//2,
         text="Continue", font="Arial 22",fill="black")
     if data.gameBlockState:
+        #draws tipping block
+        if data.nowBlock != None and (data.nowBlock[-1] == "left" or \
+        data.nowBlock[-1] == "right"):
+            print("tipping block")
+            canvas.create_polygon(data.nowBlock[0],data.nowBlock[1],
+            data.nowBlock[2],data.nowBlock[3],data.nowBlock[4],
+            data.nowBlock[5],data.nowBlock[6],data.nowBlock[7],
+            fill="red")
         #draws each moving block
         for block in data.movingBlocks:
             canvas.create_rectangle(block[0],block[1],block[2],block[3],
