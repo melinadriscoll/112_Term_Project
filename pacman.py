@@ -5,9 +5,9 @@ import random
 from tkinter import *
 
 def init(data):
-    data.startState = False
+    data.startState = True
     data.instructionState = False
-    data.gameState = True
+    data.gameState = False
     data.loseState = False
     data.winState = False
     data.margin = 10
@@ -214,20 +214,29 @@ def validToMove(data):
     y2 = data.pacman[3]
     #avoids pacman from running into any walls
     if data.pacmanDirection == "Right":
-        if (50 <= y1 <= 190-30) or (410 <= y1 <= 580-30):
-            if x2+25 >= 550:
-                return False
-        elif (190 <= y1 <= 300-30) or (340 <= y1 <= 410-30):
-            if x2+25 >= 480:
-                return False
-        else:
-            return True
+        if (95-15 < x1 < 160 and 100-15 < y1 < 155) or \
+        (270-15 < x1 < 330 and 100-15 < y1 < 200) or \
+        (180-15 < x1 < 415 and 200-15 < y1 < 235) or \
+        (440-15 < x1 < 505 and 100-15 < y1 < 155) or \
+        (x1 > 550-15 and 50 < y1 < 190-15) or \
+        (x1 > 550-15 and 410 < y1 < 550-15) or \
+        (240-15 < x1 < 360 and 280-15 < y1 < 330) or \
+        (x1 > 480-15 and 190-15 < y1 < 300) or \
+        (x1 > 480-15 and 340-15 < y1 < 410) or \
+        (170-15 < x1 < 280 and 365-15 < y1 < 440) or \
+        (320-15 < x1 < 430 and 365-15 < y1 < 440) or \
+        (95-15 < x1 < 160 and 450-15 < y1 < 540) or \
+        (160-15 < x1 < 213 and 490-15 < y1 < 540) or \
+        (440-15 < x1 < 505 and 450-15 < y1 < 540) or \
+        (387-15 < x1 < 440 and 490-15 < y1 < 540) or \
+        (265-15 < x1 < 335 and 490-15 < y1 < 540):
+            return False
     elif data.pacmanDirection == "Left":
-        if (50 <= y1 <= 190-30) or (410 <= y1 <= 580-30):
-            if x1-25 <= 50:
+        if (50 < y1 < 190-30) or (410 < y1 < 580-30):
+            if x1-25 < 50:
                 return False
-        elif (190 <= y1 <= 300-30) or (340 <= y1 <= 410-30):
-            if x1-25 <= 120:
+        elif (190 < y1 < 300-30) or (340 < y1 < 410-30):
+            if x1-25 < 120:
                 return False
         else:
             return True
@@ -242,7 +251,7 @@ def validToMove(data):
     elif data.pacmanDirection == "Down":
         if y2+35 >= 590:
             return False
-        elif (10 <= x1 <= 120) or (480 <= x2 <= 590):
+        elif (10 < x1 < 120) or (480 < x2 < 590):
             if 190 <= y2+35 <= 410:
                 return False
         else:
@@ -254,9 +263,15 @@ def movePacman(data):
     if data.pacmanDirection == "Right":
         data.pacman[0] += 25
         data.pacman[2] += 25
-        if data.pacman[2] > 590:
-            data.pacman[0] = 10
-            data.pacman[2] = 40
+        if (50 < data.pacman[1] < 190-30) or (410 < data.pacman[1] < 580-30):
+            if data.pacman[2] > 550:
+                data.pacman[0] = 10
+                data.pacman[2] = 40
+        elif (190 < data.pacman[1] < 300-30) or (340 < data.pacman[1] < 410-30):
+            if data.pacman[2] > 480:
+                data.pacman[0] = 10
+                data.pacman[2] = 40
+
     if data.pacmanDirection == "Left":
         data.pacman[0] -= 25
         data.pacman[2] -= 25
