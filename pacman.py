@@ -47,6 +47,7 @@ def keyPressed(event, data):
             data.startState = False
             data.instructionState = True
     if data.gameState:
+        #changes the direction of pac man based on the key the user presses
         if event.keysym == "Right":
             data.pacmanDirection = "Right"
         if event.keysym == "Left":
@@ -176,6 +177,7 @@ def redrawAll(canvas, data):
         text="Press 'p' to play again",font="Arial 22",fill="plum")
             
 def moveStartCircles(data):
+    #on start screen, move circles across the screen
     data.startCircles[0][0] += data.direction1
     data.startCircles[0][2] += data.direction1
     data.startCircles[1][0] += data.direction2
@@ -190,6 +192,7 @@ def moveStartCircles(data):
         data.direction2 = -5
         
 def drawCoins(data):
+    #draws each coin on the board
     result = []
     for row in range(0,19):
         for col in range(0,15):
