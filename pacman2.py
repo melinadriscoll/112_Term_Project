@@ -5,9 +5,9 @@ import random
 from tkinter import *
 
 def init(data):
-    data.startState = False
+    data.startState = True
     data.instructionState = False
-    data.gameState = True
+    data.gameState = False
     data.loseState = False
     data.winState = False
     data.margin = 10
@@ -174,26 +174,26 @@ def redrawAll(canvas, data):
                 if data.cellCount == 3600:
                     data.cellCount = 0
         #top left barrier
-        canvas.create_rectangle(110,110,178,170,fill="black",outline="blue")
+        canvas.create_rectangle(110,110,200,158,fill="black",outline="blue")
         #top middle barrier
-        canvas.create_rectangle(282,110,348,220,fill="black",outline="blue")
-        canvas.create_rectangle(190,210,438,260,fill="black",outline="blue")
+        canvas.create_rectangle(290,110,340,230,fill="black",outline="blue")
+        canvas.create_rectangle(200,230,438,260,fill="black",outline="blue")
         #top right barrier
-        canvas.create_rectangle(450,110,518,170,fill="black",outline="blue")
+        canvas.create_rectangle(420,110,518,170,fill="black",outline="blue")
         #middle left barrier
-        canvas.create_rectangle(180,400,290,460,fill="black",outline="blue")
+        canvas.create_rectangle(180,410,290,460,fill="black",outline="blue")
         #middle right barrier
-        canvas.create_rectangle(340,400,450,460,fill="black",outline="blue")
+        canvas.create_rectangle(340,410,440,460,fill="black",outline="blue")
         #bottom left barrier
-        canvas.create_rectangle(110,460,180,520,fill="black",outline="blue")
-        canvas.create_rectangle(180,500,230,520,fill="black",outline="blue")
+        canvas.create_rectangle(110,470,178,520,fill="black",outline="blue")
+        canvas.create_rectangle(178,500,230,520,fill="black",outline="blue")
         #bottom right barrier
         canvas.create_rectangle(400,500,490,520,fill="black",outline="blue")
-        canvas.create_rectangle(450,460,520,520,fill="black",outline="blue")
+        canvas.create_rectangle(450,470,520,520,fill="black",outline="blue")
         #bottom middle barrier
         canvas.create_rectangle(280,500,350,520,fill="black",outline="blue")
         #draws where the ghosts stay
-        canvas.create_rectangle(250,288,380,350,fill="black",outline="red")
+        canvas.create_rectangle(260,288,380,350,fill="black",outline="red")
         #draws coins
         for coin in data.coins:
             canvas.create_oval(coin[0],coin[1],coin[2],coin[3],fill="pink")
@@ -248,25 +248,25 @@ def drawBoard(data):
         for y in range(0,60):
             if (40 <= x <= 560 and 40 <= y*10 <= 50):
                 result[y].append("blue")
-            elif (100 <= x <= 160 and 100 <= y*10 <= 150):
+            elif (100 <= x <= 180 and 100 <= y*10 <= 140):
                 result[y].append("blue")
-            elif (270 <= x <= 330 and 100 <= y*10 <= 200):
+            elif (280 <= x <= 320 and 100 <= y*10 <= 220):
                 result[y].append("blue")
-            elif (180 <= x <= 420 and 200 <= y*10 <= 240):
+            elif (190 <= x <= 420 and 220 <= y*10 <= 240):
                 result[y].append("blue")
-            elif (440 <= x <= 500 and 100 <= y*10 <= 150):
+            elif (410 <= x <= 500 and 100 <= y*10 <= 150):
                 result[y].append("blue")
-            elif (240 <= x <= 360 and 280 <= y*10 <= 330):
+            elif (250 <= x <= 360 and 280 <= y*10 <= 330):
                 result[y].append("blue")
-            elif (170 <= x <= 270 and 390 <= y*10 <= 440):
+            elif (170 <= x <= 270 and 400 <= y*10 <= 440):
                 result[y].append("blue")
-            elif (330 <= x <= 430 and 390 <= y*10 <= 440):
+            elif (330 <= x <= 420 and 400 <= y*10 <= 440):
                 result[y].append("blue")
-            elif (100 <= x <= 160 and 450 <= y*10 <= 500):
+            elif (100 <= x <= 160 and 460 <= y*10 <= 500):
                 result[y].append("blue")
             elif (160 <= x <= 210 and 490 <= y*10 <= 500):
                 result[y].append("blue")
-            elif (440 <= x <= 500 and 450 <= y*10 <= 500):
+            elif (440 <= x <= 500 and 460 <= y*10 <= 500):
                 result[y].append("blue")
             elif (390 <= x <= 440 and 490 <= y*10 <= 500):
                 result[y].append("blue")
@@ -320,7 +320,9 @@ def validToMove(data):
             data.pacmanRightCol = 3
         else:
             #if the cell to the right is black, is valid to move
-            if data.cellColors[data.pacmanTopRow-1][data.pacmanRightCol-1]=="black":
+            row = data.pacmanTopRow-1
+            col = data.pacmanRightCol-1
+            if data.cellColors[row][col]=="black":
                 return True
             else:
                 data.pacmanRightCol -= 1
@@ -334,7 +336,9 @@ def validToMove(data):
             data.pacmanRightCol = 59
         else:
             #if the cell to the left is black, is valid to move
-            if data.cellColors[data.pacmanTopRow-1][data.pacmanLeftCol-1]=="black":
+            row = data.pacmanTopRow-1
+            col = data.pacmanLeftCol-1
+            if data.cellColors[row][col]=="black":
                 return True
             else:
                 data.pacmanRightCol += 1
@@ -344,7 +348,9 @@ def validToMove(data):
         data.pacmanTopRow -= 1
         data.pacmanBottomRow -= 1
         #if the cell above is black, is valid to move
-        if data.cellColors[data.pacmanTopRow-1][data.pacmanLeftCol-1]=="black":
+        row = data.pacmanTopRow-1
+        col = data.pacmanLeftCol-1
+        if data.cellColors[row][col]=="black":
             return True
         else:
             data.pacmanTopRow += 1
@@ -354,7 +360,9 @@ def validToMove(data):
         data.pacmanTopRow += 1
         data.pacmanBottomRow += 1
         #if the cell below is black, is valid to move
-        if data.cellColors[data.pacmanBottomRow-1][data.pacmanLeftCol-1]=="black":
+        row = data.pacmanBottomRow-1
+        col = data.pacmanLeftCol-1
+        if data.cellColors[row][col]=="black":
             return True
         else:
             data.pacmanTopRow -= 1
@@ -485,10 +493,10 @@ def getCoins(data):
     
 def checkCollisions(data):
     for ghost in data.ghosts:
-        if (ghost[0] <= data.pacmanLeftCol <= ghost[0]+3 or \
-        ghost[0] <= data.pacmanRightCol <= ghost[0]+3) and \
-        (ghost[1] <= data.pacmanTopRow <= ghost[1]+3 or \
-        ghost[1] <= data.pacmanBottomRow <= ghost[1]+3):
+        if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
+        ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
+        (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
+        ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
             data.gameState = False
             data.loseState = True
             
