@@ -162,6 +162,7 @@ def redrawAll(canvas, data):
         canvas.create_text(data.width//2,475,text="Continue",font="Arial 28 bold",
         fill="black")
     if data.gameState:
+        #draws board
         for x in range(0,data.height,10):
             for y in range(0,data.width,10):
                 if data.cellCount < 3600:
@@ -172,12 +173,33 @@ def redrawAll(canvas, data):
                     data.cellCount += 1
                 if data.cellCount == 3600:
                     data.cellCount = 0
+        #top left barrier
+        canvas.create_rectangle(110,110,178,170,fill="black",outline="blue")
+        #top middle barrier
+        canvas.create_rectangle(282,110,348,220,fill="black",outline="blue")
+        canvas.create_rectangle(190,210,438,260,fill="black",outline="blue")
+        #top right barrier
+        canvas.create_rectangle(450,110,518,170,fill="black",outline="blue")
+        #middle left barrier
+        canvas.create_rectangle(180,400,290,460,fill="black",outline="blue")
+        #middle right barrier
+        canvas.create_rectangle(340,400,450,460,fill="black",outline="blue")
+        #bottom left barrier
+        canvas.create_rectangle(110,460,180,520,fill="black",outline="blue")
+        canvas.create_rectangle(180,500,230,520,fill="black",outline="blue")
+        #bottom right barrier
+        canvas.create_rectangle(400,500,490,520,fill="black",outline="blue")
+        canvas.create_rectangle(450,460,520,520,fill="black",outline="blue")
+        #bottom middle barrier
+        canvas.create_rectangle(280,500,350,520,fill="black",outline="blue")
+        #draws where the ghosts stay
+        canvas.create_rectangle(250,288,380,350,fill="black",outline="red")
         #draws coins
         for coin in data.coins:
             canvas.create_oval(coin[0],coin[1],coin[2],coin[3],fill="pink")
         #draws the score
         scoreText = "Score: %d" % (data.score)
-        canvas.create_text(50,25,text=scoreText,fill="white")
+        canvas.create_text(60,25,text=scoreText,fill="white",font="Arial 25")
         #draws pac man
         canvas.create_oval(data.pacmanLeftCol*10,data.pacmanTopRow*10,
         data.pacmanRightCol*10,data.pacmanBottomRow*10,fill="yellow")
