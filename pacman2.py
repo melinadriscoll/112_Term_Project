@@ -24,9 +24,9 @@ def init(data):
     data.startCircle[2]-80,data.startCircle[3]]
     data.startLost = False
     data.timerDelay = 100
-    data.coins = []
+    data.coins = drawCoins(data)
     data.count = 0
-    data.score = 0
+    data.score = -2
     data.numRows = data.height//20
     data.numCols = data.width//20
     data.pacmanTopRow = 41
@@ -38,7 +38,11 @@ def init(data):
     data.pacman = [data.pacmanCenterX-15,data.pacmanCenterY-15,
     data.pacmanCenterX+15,data.pacmanCenterY+15]
     data.pacmanDirection = None
-    data.ghosts = [[26,30,"red"],[30,30,"green"],[34,30,"orange"]]
+    data.ghosts = [[26,30,"tomato"],[30,30,"deepskyblue"],[34,30,"magenta"]]
+    data.directions = ["Right", "Left", "Up", "Down"]
+    data.ghost1Direction = None
+    data.ghost2Direction = None
+    data.ghost3Direction = None
     
 def mousePressed(event, data):
     x = event.x
@@ -48,8 +52,6 @@ def mousePressed(event, data):
             if 450 <= y <= 500:
                 data.instructionState = False
                 data.gameState = True
-    if data.gameState:
-        print(x,y)
 
 def keyPressed(event, data):
     if data.startState:
@@ -68,7 +70,7 @@ def keyPressed(event, data):
             data.pacmanDirection = "Down"
     if data.loseState or data.winState:
         if event.keysym == "p":
-            init()
+            init(data)
     
 def timerFired(data):
     if data.startState:
@@ -83,12 +85,48 @@ def timerFired(data):
             data.startLost = True
     if data.gameState:
         if validToMove(data):
-            print(validToMove(data))
             if data.count%2 == 0:
                 movePacman(data)
                 if getCoins(data):
                     data.score += 1
         data.count += 1
+        if len(data.coins) == 0:
+            data.gameState = False
+            data.winState = True
+        #moves ghost one
+        if data.count == 5:
+            data.ghosts[0][1] = 26
+        data.ghost1Direction = "Right"
+        if (data.count >= 10 and data.count%10==0) or \
+        not(validGhostMove(data,1)):
+            randomIndex = random.randint(0,len(data.directions)-1)
+            data.ghost1Direction = data.directions[randomIndex]
+            validGhostMove(data,1)
+        elif validGhostMove(data,1):
+            moveGhost(data,1)
+        #moves ghost two
+        if data.count == 15:
+            data.ghosts[1][1] = 26
+        data.ghost1Direction = "Right"
+        if (data.count >= 10 and data.count%10==0) or \
+        not(validGhostMove(data,2)):
+            randomIndex = random.randint(0,len(data.directions)-1)
+            data.ghost2Direction = data.directions[randomIndex]
+            validGhostMove(data,2)
+        elif validGhostMove(data,2):
+            moveGhost(data,2)
+        #moves ghost three
+        if data.count == 30:
+            data.ghosts[2][1] = 26
+        data.ghost1Direction = "Right"
+        if (data.count >= 10 and data.count%10==0) or \
+        not(validGhostMove(data,3)):
+            randomIndex = random.randint(0,len(data.directions)-1)
+            data.ghost3Direction = data.directions[randomIndex]
+            validGhostMove(data,3)
+        elif validGhostMove(data,3):
+            moveGhost(data,3)
+        checkCollisions(data)
 
 def redrawAll(canvas, data):
     canvas.create_rectangle(data.margin,data.margin,data.width-data.margin,
@@ -128,24 +166,15 @@ def redrawAll(canvas, data):
             for y in range(0,data.width,10):
                 if data.cellCount < 3600:
                     #draws each cell blue or black
-                    color = data.cellColors[data.cellCount]
+                    color = data.cellColors[y//10][x//10]
                     canvas.create_rectangle(x+10,y+10,x+20,y+20,
                     fill=color,outline=color)
-                    #if cell is black and within the walls, draw a coin
-                    if color == "black" and x%3==0 and y%3 == 0:
-                        if (x < 50 or x > 560) and (300 > y or y > 340):
-                            pass
-                        elif y < 50 or y > 560:
-                            pass
-                        elif (x > 480 or x < 120) and \
-                        (190 < y < 300 or 340 < y < 410):
-                            pass
-                        else:
-                            canvas.create_oval(x+10,y-5,x+20,y+5,fill="pink")
-                            data.coins.append([x+10,y-5,x+20,y+5])
                     data.cellCount += 1
                 if data.cellCount == 3600:
                     data.cellCount = 0
+        #draws coins
+        for coin in data.coins:
+            canvas.create_oval(coin[0],coin[1],coin[2],coin[3],fill="pink")
         #draws the score
         scoreText = "Score: %d" % (data.score)
         canvas.create_text(50,25,text=scoreText,fill="white")
@@ -189,109 +218,178 @@ def moveStartCircles(data):
         data.direction2 = -5
         
 def drawBoard(data):
-    result = []
+    result = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],
+    [],[],[],[],[],[],[],[],[],[],[],[],[],[],[],
+    [],[],[],[],[],[],[],[],[],[],[],[],[],[],[],
+    [],[],[],[],[],[],[],[],[],[],[],[],[],[],[]]
     for x in range(0,data.height,10):
-        for y in range(0,data.width,10):
-            if (40 <= x <= 560 and 40 <= y <= 50):
-                result.append("blue")
-            elif (90 <= x <= 160 and 100 <= y <= 150):
-                result.append("blue")
-            elif (270 <= x <= 330 and 100 <= y <= 200):
-                result.append("blue")
-            elif (180 <= x <= 420 and 200 <= y <= 240):
-                result.append("blue")
-            elif (440 <= x <= 510 and 100 <= y <= 150):
-                result.append("blue")
-            elif (240 <= x <= 360 and 280 <= y <= 330):
-                result.append("blue")
-            elif (170 <= x <= 270 and 390 <= y <= 440):
-                result.append("blue")
-            elif (330 <= x <= 430 and 390 <= y <= 440):
-                result.append("blue")
-            elif (90 <= x <= 160 and 450 <= y <= 510):
-                result.append("blue")
-            elif (160 <= x <= 210 and 490 <= y <= 510):
-                result.append("blue")
-            elif (440 <= x <= 500 and 450 <= y <= 510):
-                result.append("blue")
-            elif (390 <= x <= 440 and 490 <= y <= 510):
-                result.append("blue")
-            elif (270 <= x <= 330 and 490 <= y <= 510):
-                result.append("blue")
-            elif (550 <= x <= 560 and 40 <= y <= 200):
-                result.append("blue")
-            elif (480 <= x <= 560 and 190 <= y <= 200):
-                result.append("blue")
-            elif (480 <= x <= 490 and 190 <= y <= 300):
-                result.append("blue")
-            elif (480 <= x <= 600 and 290 <= y <= 300):
-                result.append("blue")
-            elif (480 <= x <= 600 and 340 <= y <= 350):
-                result.append("blue")
-            elif (480 <= x <= 490 and 350 <= y <= 410):
-                result.append("blue")
-            elif (480 <= x <= 560 and 400 <= y <= 410):
-                result.append("blue")
-            elif (550 <= x <= 560 and 400 <= y <= 560):
-                result.append("blue")
-            elif (40 <= x <= 560 and 550 <= y <= 560):
-                result.append("blue")
-            elif (40 <= x <= 50 and 400 <= y <= 560):
-                result.append("blue")
-            elif (40 <= x <= 120 and 400 <= y <= 410):
-                result.append("blue")
-            elif (110 <= x <= 120 and 340 <= y <= 410):
-                result.append("blue")
-            elif (0 <= x <= 120 and 340 <= y <= 350):
-                result.append("blue")
-            elif (0 <= x <= 120 and 290 <= y <= 300):
-                result.append("blue")
-            elif (110 <= x <= 120 and 190 <= y <= 300):
-                result.append("blue")
-            elif (40 <= x <= 120 and 190 <= y <= 200):
-                result.append("blue")
-            elif (40 <= x <= 50 and 40 <= y <= 200):
-                result.append("blue")
+        for y in range(0,60):
+            if (40 <= x <= 560 and 40 <= y*10 <= 50):
+                result[y].append("blue")
+            elif (100 <= x <= 160 and 100 <= y*10 <= 150):
+                result[y].append("blue")
+            elif (270 <= x <= 330 and 100 <= y*10 <= 200):
+                result[y].append("blue")
+            elif (180 <= x <= 420 and 200 <= y*10 <= 240):
+                result[y].append("blue")
+            elif (440 <= x <= 500 and 100 <= y*10 <= 150):
+                result[y].append("blue")
+            elif (240 <= x <= 360 and 280 <= y*10 <= 330):
+                result[y].append("blue")
+            elif (170 <= x <= 270 and 390 <= y*10 <= 440):
+                result[y].append("blue")
+            elif (330 <= x <= 430 and 390 <= y*10 <= 440):
+                result[y].append("blue")
+            elif (100 <= x <= 160 and 450 <= y*10 <= 500):
+                result[y].append("blue")
+            elif (160 <= x <= 210 and 490 <= y*10 <= 500):
+                result[y].append("blue")
+            elif (440 <= x <= 500 and 450 <= y*10 <= 500):
+                result[y].append("blue")
+            elif (390 <= x <= 440 and 490 <= y*10 <= 500):
+                result[y].append("blue")
+            elif (270 <= x <= 330 and 490 <= y*10 <= 500):
+                result[y].append("blue")
+            elif (550 <= x <= 560 and 40 <= y*10 <= 200):
+                result[y].append("blue")
+            elif (480 <= x <= 560 and 190 <= y*10 <= 200):
+                result[y].append("blue")
+            elif (480 <= x <= 490 and 190 <= y*10 <= 300):
+                result[y].append("blue")
+            elif (480 <= x <= 600 and 290 <= y*10 <= 300):
+                result[y].append("blue")
+            elif (480 <= x <= 600 and 340 <= y*10 <= 350):
+                result[y].append("blue")
+            elif (480 <= x <= 490 and 350 <= y*10 <= 410):
+                result[y].append("blue")
+            elif (480 <= x <= 560 and 400 <= y*10 <= 410):
+                result[y].append("blue")
+            elif (550 <= x <= 560 and 400 <= y*10 <= 560):
+                result[y].append("blue")
+            elif (40 <= x <= 560 and 550 <= y*10 <= 560):
+                result[y].append("blue")
+            elif (40 <= x <= 50 and 400 <= y*10 <= 560):
+                result[y].append("blue")
+            elif (40 <= x <= 120 and 400 <= y*10 <= 410):
+                result[y].append("blue")
+            elif (110 <= x <= 120 and 340 <= y*10 <= 410):
+                result[y].append("blue")
+            elif (0 <= x <= 120 and 340 <= y*10 <= 350):
+                result[y].append("blue")
+            elif (0 <= x <= 120 and 290 <= y*10 <= 300):
+                result[y].append("blue")
+            elif (110 <= x <= 120 and 190 <= y*10 <= 300):
+                result[y].append("blue")
+            elif (40 <= x <= 120 and 190 <= y*10 <= 200):
+                result[y].append("blue")
+            elif (40 <= x <= 50 and 40 <= y*10 <= 200):
+                result[y].append("blue")
             else:
-                result.append("black")    
-    result[749] = "red"
-    result[1343] = "orange"
+                result[y].append("black")
     return result
           
 def validToMove(data):
     #avoids pacman from running into any walls
     if data.pacmanDirection == "Right":
-        data.pacmanTopRightCell = (data.pacmanTopRow*(data.pacmanRightCol+1))+119
-        print(data.cellColors[data.pacmanTopRightCell])
-        print(data.pacmanTopRightCell,data.pacmanTopRow,data.pacmanRightCol)
-        if data.cellColors[data.pacmanTopRightCell] == "black":
-            return True
+        data.pacmanRightCol += 1
+        data.pacmanLeftCol += 1
+        if 32 <= data.pacmanTopRow <= 33 and data.pacmanRightCol > 59:
+            data.pacmanLeftCol = 0
+            data.pacmanRightCol = 3
         else:
-            print("false right")
-            return False
+            #if the cell to the right is black, is valid to move
+            if data.cellColors[data.pacmanTopRow-1][data.pacmanRightCol-1]=="black":
+                return True
+            else:
+                data.pacmanRightCol -= 1
+                data.pacmanLeftCol -= 1
+                return False
     elif data.pacmanDirection == "Left":
-        data.pacmanTopLeftCell = (data.pacmanTopRow*(data.pacmanLeftCol-1))+119
-        if data.cellColors[data.pacmanTopLeftCell] == "black":
-            print(data.cellColors[data.pacmanTopLeftCell])
-            return True
+        data.pacmanRightCol -= 1
+        data.pacmanLeftCol -= 1
+        if 32 <= data.pacmanTopRow <= 33 and data.pacmanLeftCol < 0:
+            data.pacmanLeftCol = 56
+            data.pacmanRightCol = 59
         else:
-            return False
+            #if the cell to the left is black, is valid to move
+            if data.cellColors[data.pacmanTopRow-1][data.pacmanLeftCol-1]=="black":
+                return True
+            else:
+                data.pacmanRightCol += 1
+                data.pacmanLeftCol += 1
+                return False
     elif data.pacmanDirection == "Up":
-        data.pacmanTopLeftCell = ((data.pacmanTopRow-1)*data.pacmanLeftCol)+119
-        print(data.pacmanTopLeftCell)
-        if data.cellColors[data.pacmanTopLeftCell] == "black":
-            print(data.cellColors[data.pacmanTopLeftCell])
+        data.pacmanTopRow -= 1
+        data.pacmanBottomRow -= 1
+        #if the cell above is black, is valid to move
+        if data.cellColors[data.pacmanTopRow-1][data.pacmanLeftCol-1]=="black":
             return True
         else:
+            data.pacmanTopRow += 1
+            data.pacmanBottomRow += 1
             return False
     elif data.pacmanDirection == "Down":
-        data.pacmanBottomLeftCell = ((data.pacmanBottomRow+1)* \
-        data.pacmanLeftCol)+119
-        if data.cellColors[data.pacmanBottomLeftCell] == "black":
-            print(data.cellColors[data.pacmanBottomLeftCell])
+        data.pacmanTopRow += 1
+        data.pacmanBottomRow += 1
+        #if the cell below is black, is valid to move
+        if data.cellColors[data.pacmanBottomRow-1][data.pacmanLeftCol-1]=="black":
             return True
         else:
-            print("false")
+            data.pacmanTopRow -= 1
+            data.pacmanBottomRow -= 1
+            return False
+    else:
+        return True
+        
+def validGhostMove(data,num):
+    if num == 1:
+        direction = data.ghost1Direction
+    if num == 2:
+        direction = data.ghost2Direction
+    if num == 3:
+        direction = data.ghost3Direction
+    #rightCol = data.ghosts[num-1][0]+30
+    #leftCol = data.ghosts[num-1][0]
+    #topRow = data.ghosts[num-1][1]
+    #bottomRow = data.ghosts[num-1][1]+30
+    #avoids the ghost from running into any walls
+    if direction == "Right":
+        data.ghosts[num-1][0] += 1
+        if 32 <= data.ghosts[num-1][1] <= 33 and data.ghosts[num-1][0]+3 > 59:
+            data.ghosts[num-1][0] = 0
+        else:
+            #if the cell to the right is black, is valid to move
+            if data.cellColors[data.ghosts[num-1][1]-1][data.ghosts[num-1][0]+2]=="black":
+                return True
+            else:
+                data.ghosts[num-1][0] -= 1
+                return False
+    elif direction == "Left":
+        data.ghosts[num-1][0] -= 1
+        if 32 <= data.ghosts[num-1][1] <= 33 and data.ghosts[num-1][0] < 0:
+            data.ghosts[num-1][0] = 56
+        else:
+            #if the cell to the left is black, is valid to move
+            if data.cellColors[data.ghosts[num-1][1]-1][data.ghosts[num-1][0]-1]=="black":
+                return True
+            else:
+                data.ghosts[num-1][0] += 1
+                return False
+    elif direction == "Up":
+        data.ghosts[num-1][1] -= 1
+        #if the cell above is black, is valid to move
+        if data.cellColors[data.ghosts[num-1][1]-1][data.ghosts[num-1][0]-1]=="black":
+            return True
+        else:
+            data.ghosts[num-1][1] += 1
+            return False
+    elif direction == "Down":
+        data.ghosts[num-1][1] += 1
+        #if the cell below is black, is valid to move
+        if data.cellColors[data.ghosts[num-1][1]+2][data.ghosts[num-1][0]-1]=="black":
+            return True
+        else:
+            data.ghosts[num-1][1] -= 1
             return False
     else:
         return True
@@ -300,13 +398,13 @@ def movePacman(data):
     if data.pacmanDirection == "Right":
         data.pacmanLeftCol += 1
         data.pacmanRightCol += 1
-        if data.pacmanTopRow == 30 and data.pacmanRightCol > 59:
+        if data.pacmanTopRow == 32 and data.pacmanRightCol > 59:
             data.pacmanLeftCol = 0
             data.pacmanRightCol = 3
     if data.pacmanDirection == "Left":
         data.pacmanLeftCol -= 1
         data.pacmanRightCol -= 1
-        if data.pacmanTopRow == 30 and data.pacmanLeftCol < 0:
+        if data.pacmanTopRow == 32 and data.pacmanLeftCol < 0:
             data.pacmanLeftCol = 56
             data.pacmanRightCol = 59
     if data.pacmanDirection == "Up":
@@ -316,13 +414,61 @@ def movePacman(data):
         data.pacmanTopRow += 1
         data.pacmanBottomRow += 1
         
+def moveGhost(data,num):
+    if data.count%50 == 0:
+        if num == 1:
+            direction = data.ghost1Direction
+        if num == 2:
+            direction = data.ghost2Direction
+        if num == 3:
+            direction = data.ghost3Direction
+        #rightCol = data.ghosts[num-1][0]+30
+        #leftCol = data.ghosts[num-1][0]
+        #topRow = data.ghosts[num-1][1]
+        #bottomRow = data.ghosts[num-1][1]+30
+        if direction == "Right":
+            data.ghosts[num-1][0] += 1
+            if data.ghosts[num-1][1] == 32 and data.ghosts[num-1][0]+3 > 59:
+                data.ghosts[num-1][0] = 0
+        if direction == "Left":
+            data.ghosts[num-1][0] -= 1
+            if data.ghosts[num-1][1] == 32 and data.ghosts[num-1][0] < 0:
+                data.ghosts[num-1][0] = 56
+        if direction == "Up":
+            data.ghosts[num-1][1] -= 1
+        if direction == "Down":
+            data.ghosts[num-1][1] += 1
+        
+def drawCoins(data):
+    results = []
+    for x in range(0,60):
+        for y in range(0,60):
+            if data.cellColors[y-1][x-1] == "black" and x%3 == 0 and y%3==0:
+                if not((x*10 < 50 or x*10 > 560) and \
+                ((300 > y*10 or y*10 > 340)) or \
+                (y*10 < 50 or y*10 > 560) or \
+                ((x*10 > 480 or x*10 < 120) and \
+                (190 < y*10 < 300 or 340 < y*10 < 410))):
+                    if x*10 > 10:
+                        results.append([x*10,y*10,x*10+10,y*10+10])
+    return results
+        
 def getCoins(data):
     for coin in data.coins:
-        if data.pacmanLeftCol*10 <= coin[0] <= data.pacmanRightCol*10:
-            if data.pacmanTopRow*10 <= coin[1] <= data.pacmanBottomRow*10:
+        if data.pacmanLeftCol <= coin[0]//10 <= data.pacmanRightCol:
+            if data.pacmanTopRow <= coin[1]//10 <= data.pacmanBottomRow:
                 data.coins.remove(coin)
                 return True
     return False
+    
+def checkCollisions(data):
+    for ghost in data.ghosts:
+        if (ghost[0] <= data.pacmanLeftCol <= ghost[0]+3 or \
+        ghost[0] <= data.pacmanRightCol <= ghost[0]+3) and \
+        (ghost[1] <= data.pacmanTopRow <= ghost[1]+3 or \
+        ghost[1] <= data.pacmanBottomRow <= ghost[1]+3):
+            data.gameState = False
+            data.loseState = True
             
 ####################################
 # use the run function as-is
