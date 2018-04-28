@@ -5,9 +5,9 @@ import random
 from tkinter import *
 
 def init(data):
-    data.startState = True
+    data.startState = False
     data.instructionState = False
-    data.gameState = False
+    data.gameState = True
     data.loseState = False
     data.winState = False
     data.margin = 10
@@ -85,10 +85,9 @@ def timerFired(data):
             data.startLost = True
     if data.gameState:
         if validToMove(data):
-            if data.count%2 == 0:
-                movePacman(data)
-                if getCoins(data):
-                    data.score += 1
+            movePacman(data)
+            if getCoins(data):
+                data.score += 1
         data.count += 1
         if len(data.coins) == 0:
             data.gameState = False
@@ -97,35 +96,38 @@ def timerFired(data):
         if data.count == 5:
             data.ghosts[0][1] = 26
         data.ghost1Direction = "Right"
-        if (data.count >= 10 and data.count%10==0) or \
-        not(validGhostMove(data,1)):
-            randomIndex = random.randint(0,len(data.directions)-1)
-            data.ghost1Direction = data.directions[randomIndex]
-            validGhostMove(data,1)
-        elif validGhostMove(data,1):
-            moveGhost(data,1)
+        if (data.count >= 5):
+            if validGhostMove(data,1):
+                moveGhost(data,1)
+            else:
+                randomIndex = random.randint(0,len(data.directions)-1)
+                data.ghost1Direction = data.directions[randomIndex]
+                if validGhostMove(data,1):
+                    moveGhost(data,1)
         #moves ghost two
         if data.count == 15:
             data.ghosts[1][1] = 26
-        data.ghost1Direction = "Right"
-        if (data.count >= 10 and data.count%10==0) or \
-        not(validGhostMove(data,2)):
-            randomIndex = random.randint(0,len(data.directions)-1)
-            data.ghost2Direction = data.directions[randomIndex]
-            validGhostMove(data,2)
-        elif validGhostMove(data,2):
-            moveGhost(data,2)
+        data.ghost2Direction = "Left"
+        if (data.count >= 15):
+            if validGhostMove(data,2):
+                moveGhost(data,2)
+            else:
+                randomIndex = random.randint(0,len(data.directions)-1)
+                data.ghost2Direction = data.directions[randomIndex]
+                if validGhostMove(data,2):
+                    moveGhost(data,2)
         #moves ghost three
         if data.count == 30:
             data.ghosts[2][1] = 26
-        data.ghost1Direction = "Right"
-        if (data.count >= 10 and data.count%10==0) or \
-        not(validGhostMove(data,3)):
-            randomIndex = random.randint(0,len(data.directions)-1)
-            data.ghost3Direction = data.directions[randomIndex]
-            validGhostMove(data,3)
-        elif validGhostMove(data,3):
-            moveGhost(data,3)
+        data.ghost3Direction = "Right"
+        if (data.count >= 30):
+            if validGhostMove(data,3):
+                moveGhost(data,3)
+            else:
+                randomIndex = random.randint(0,len(data.directions)-1)
+                data.ghost3Direction = data.directions[randomIndex]
+                if validGhostMove(data,3):
+                    moveGhost(data,3)
         checkCollisions(data)
 
 def redrawAll(canvas, data):
@@ -136,7 +138,7 @@ def redrawAll(canvas, data):
         canvas.create_text(data.width//2,data.height//3,
         text="Welcome to Pac-Man",fill="plum",font="Arial 50 bold")
         canvas.create_text(data.width//2,data.height//2+60,
-        text="Press 'b' to begin",fill="powderblue",font="Arial 32 bold")
+        text="Press 'b' to begin",fill="deepskyblue",font="Arial 32 bold")
         for circle in data.startCircles:
             canvas.create_oval(circle[0],circle[1],circle[2],circle[3],
             fill="yellow")
@@ -153,7 +155,7 @@ def redrawAll(canvas, data):
         data.startCircle[2],data.startCircle[3],fill="yellow")
         #draws ghost following pacman
         canvas.create_oval(data.startGhost[0],data.startGhost[1],
-        data.startGhost[2],data.startGhost[3],fill="red")
+        data.startGhost[2],data.startGhost[3],fill="deepskyblue")
         if data.startLost:
             canvas.create_text(data.width//2,data.height//2+70,text="YOU LOST",
             font="Arial 34 bold", fill="plum")
@@ -186,12 +188,12 @@ def redrawAll(canvas, data):
         canvas.create_rectangle(340,410,440,460,fill="black",outline="blue")
         #bottom left barrier
         canvas.create_rectangle(110,470,178,520,fill="black",outline="blue")
-        canvas.create_rectangle(178,500,230,520,fill="black",outline="blue")
+        canvas.create_rectangle(178,510,230,530,fill="black",outline="blue")
         #bottom right barrier
-        canvas.create_rectangle(400,500,490,520,fill="black",outline="blue")
+        canvas.create_rectangle(400,510,450,530,fill="black",outline="blue")
         canvas.create_rectangle(450,470,520,520,fill="black",outline="blue")
         #bottom middle barrier
-        canvas.create_rectangle(280,500,350,520,fill="black",outline="blue")
+        canvas.create_rectangle(280,510,350,530,fill="black",outline="blue")
         #draws where the ghosts stay
         canvas.create_rectangle(260,288,380,350,fill="black",outline="red")
         #draws coins
@@ -252,11 +254,11 @@ def drawBoard(data):
                 result[y].append("blue")
             elif (280 <= x <= 320 and 100 <= y*10 <= 220):
                 result[y].append("blue")
-            elif (190 <= x <= 420 and 220 <= y*10 <= 240):
+            elif (190 <= x <= 420 and 220 <= y*10 <= 230):
                 result[y].append("blue")
             elif (410 <= x <= 500 and 100 <= y*10 <= 150):
                 result[y].append("blue")
-            elif (250 <= x <= 360 and 280 <= y*10 <= 330):
+            elif (250 <= x <= 360 and 290 <= y*10 <= 330):
                 result[y].append("blue")
             elif (170 <= x <= 270 and 400 <= y*10 <= 440):
                 result[y].append("blue")
@@ -264,47 +266,47 @@ def drawBoard(data):
                 result[y].append("blue")
             elif (100 <= x <= 160 and 460 <= y*10 <= 500):
                 result[y].append("blue")
-            elif (160 <= x <= 210 and 490 <= y*10 <= 500):
+            elif (170 <= x <= 210 and 500 <= y*10 <= 510):
                 result[y].append("blue")
             elif (440 <= x <= 500 and 460 <= y*10 <= 500):
                 result[y].append("blue")
-            elif (390 <= x <= 440 and 490 <= y*10 <= 500):
+            elif (390 <= x <= 430 and 500 <= y*10 <= 510):
                 result[y].append("blue")
-            elif (270 <= x <= 330 and 490 <= y*10 <= 500):
+            elif (270 <= x <= 330 and 500 <= y*10 <= 510):
                 result[y].append("blue")
             elif (550 <= x <= 560 and 40 <= y*10 <= 200):
                 result[y].append("blue")
-            elif (480 <= x <= 560 and 190 <= y*10 <= 200):
+            elif (480 <= x <= 560 and 200 <= y*10 <= 210):
                 result[y].append("blue")
-            elif (480 <= x <= 490 and 190 <= y*10 <= 300):
+            elif (470 <= x <= 480 and 200 <= y*10 <= 290):
                 result[y].append("blue")
-            elif (480 <= x <= 600 and 290 <= y*10 <= 300):
+            elif (480 <= x <= 600 and 280 <= y*10 <= 290):
                 result[y].append("blue")
-            elif (480 <= x <= 600 and 340 <= y*10 <= 350):
+            elif (480 <= x <= 600 and 350 <= y*10 <= 360):
                 result[y].append("blue")
-            elif (480 <= x <= 490 and 350 <= y*10 <= 410):
+            elif (470 <= x <= 480 and 350 <= y*10 <= 410):
                 result[y].append("blue")
             elif (480 <= x <= 560 and 400 <= y*10 <= 410):
                 result[y].append("blue")
-            elif (550 <= x <= 560 and 400 <= y*10 <= 560):
+            elif (560 <= x <= 570 and 400 <= y*10 <= 570):
                 result[y].append("blue")
-            elif (40 <= x <= 560 and 550 <= y*10 <= 560):
+            elif (40 <= x <= 560 and 560 <= y*10 <= 570):
                 result[y].append("blue")
-            elif (40 <= x <= 50 and 400 <= y*10 <= 560):
+            elif (30 <= x <= 40 and 400 <= y*10 <= 570):
                 result[y].append("blue")
             elif (40 <= x <= 120 and 400 <= y*10 <= 410):
                 result[y].append("blue")
-            elif (110 <= x <= 120 and 340 <= y*10 <= 410):
+            elif (110 <= x <= 120 and 350 <= y*10 <= 410):
                 result[y].append("blue")
-            elif (0 <= x <= 120 and 340 <= y*10 <= 350):
+            elif (0 <= x <= 120 and 350 <= y*10 <= 360):
                 result[y].append("blue")
-            elif (0 <= x <= 120 and 290 <= y*10 <= 300):
+            elif (0 <= x <= 120 and 280 <= y*10 <= 290):
                 result[y].append("blue")
-            elif (110 <= x <= 120 and 190 <= y*10 <= 300):
+            elif (110 <= x <= 120 and 200 <= y*10 <= 290):
                 result[y].append("blue")
-            elif (40 <= x <= 120 and 190 <= y*10 <= 200):
+            elif (30 <= x <= 120 and 200 <= y*10 <= 210):
                 result[y].append("blue")
-            elif (40 <= x <= 50 and 40 <= y*10 <= 200):
+            elif (30 <= x <= 40 and 40 <= y*10 <= 200):
                 result[y].append("blue")
             else:
                 result[y].append("black")
@@ -315,14 +317,16 @@ def validToMove(data):
     if data.pacmanDirection == "Right":
         data.pacmanRightCol += 1
         data.pacmanLeftCol += 1
-        if 32 <= data.pacmanTopRow <= 33 and data.pacmanRightCol > 59:
+        if 31 <= data.pacmanTopRow <= 33 and data.pacmanRightCol > 59:
             data.pacmanLeftCol = 0
             data.pacmanRightCol = 3
         else:
             #if the cell to the right is black, is valid to move
             row = data.pacmanTopRow-1
             col = data.pacmanRightCol-1
-            if data.cellColors[row][col]=="black":
+            row2 = data.pacmanBottomRow-1
+            if data.cellColors[row][col]=="black" and \
+            data.cellColors[row2][col] == "black":
                 return True
             else:
                 data.pacmanRightCol -= 1
@@ -331,14 +335,16 @@ def validToMove(data):
     elif data.pacmanDirection == "Left":
         data.pacmanRightCol -= 1
         data.pacmanLeftCol -= 1
-        if 32 <= data.pacmanTopRow <= 33 and data.pacmanLeftCol < 0:
+        if 31 <= data.pacmanTopRow <= 33 and data.pacmanLeftCol < 0:
             data.pacmanLeftCol = 56
             data.pacmanRightCol = 59
         else:
             #if the cell to the left is black, is valid to move
             row = data.pacmanTopRow-1
             col = data.pacmanLeftCol-1
-            if data.cellColors[row][col]=="black":
+            row2 = data.pacmanBottomRow-1
+            if data.cellColors[row][col]=="black" and \
+            data.cellColors[row2][col]=="black":
                 return True
             else:
                 data.pacmanRightCol += 1
@@ -350,7 +356,9 @@ def validToMove(data):
         #if the cell above is black, is valid to move
         row = data.pacmanTopRow-1
         col = data.pacmanLeftCol-1
-        if data.cellColors[row][col]=="black":
+        col2 = data.pacmanRightCol-1
+        if data.cellColors[row][col]=="black" and \
+        data.cellColors[row][col2] == "black":
             return True
         else:
             data.pacmanTopRow += 1
@@ -362,7 +370,9 @@ def validToMove(data):
         #if the cell below is black, is valid to move
         row = data.pacmanBottomRow-1
         col = data.pacmanLeftCol-1
-        if data.cellColors[row][col]=="black":
+        col2 = data.pacmanRightCol-1
+        if data.cellColors[row][col]=="black" and \
+        data.cellColors[row][col2]=="black":
             return True
         else:
             data.pacmanTopRow -= 1
@@ -378,29 +388,37 @@ def validGhostMove(data,num):
         direction = data.ghost2Direction
     if num == 3:
         direction = data.ghost3Direction
-    #rightCol = data.ghosts[num-1][0]+30
+    #rightCol = data.ghosts[num-1][0]+3
     #leftCol = data.ghosts[num-1][0]
     #topRow = data.ghosts[num-1][1]
-    #bottomRow = data.ghosts[num-1][1]+30
+    #bottomRow = data.ghosts[num-1][1]+3
     #avoids the ghost from running into any walls
     if direction == "Right":
         data.ghosts[num-1][0] += 1
-        if 32 <= data.ghosts[num-1][1] <= 33 and data.ghosts[num-1][0]+3 > 59:
+        if 31 <= data.ghosts[num-1][1] <= 33 and data.ghosts[num-1][0]+3 > 59:
             data.ghosts[num-1][0] = 0
         else:
             #if the cell to the right is black, is valid to move
-            if data.cellColors[data.ghosts[num-1][1]-1][data.ghosts[num-1][0]+2]=="black":
+            row = data.ghosts[num-1][1]-1
+            col = data.ghosts[num-1][0]+2
+            row2 = data.ghosts[num-1][1]+2
+            if data.cellColors[row][col]=="black" and \
+            data.cellColors[row2][col] == "black":
                 return True
             else:
                 data.ghosts[num-1][0] -= 1
                 return False
     elif direction == "Left":
         data.ghosts[num-1][0] -= 1
-        if 32 <= data.ghosts[num-1][1] <= 33 and data.ghosts[num-1][0] < 0:
+        if 31 <= data.ghosts[num-1][1] <= 33 and data.ghosts[num-1][0] < 0:
             data.ghosts[num-1][0] = 56
         else:
             #if the cell to the left is black, is valid to move
-            if data.cellColors[data.ghosts[num-1][1]-1][data.ghosts[num-1][0]-1]=="black":
+            row = data.ghosts[num-1][1]-1
+            col = data.ghosts[num-1][0]-1
+            row2 = data.ghosts[num-1][1]+2
+            if data.cellColors[row][col]=="black" and \
+            data.cellColors[row2][col]=="black":
                 return True
             else:
                 data.ghosts[num-1][0] += 1
@@ -408,7 +426,11 @@ def validGhostMove(data,num):
     elif direction == "Up":
         data.ghosts[num-1][1] -= 1
         #if the cell above is black, is valid to move
-        if data.cellColors[data.ghosts[num-1][1]-1][data.ghosts[num-1][0]-1]=="black":
+        row = data.ghosts[num-1][1]-1
+        col = data.ghosts[num-1][0]-1
+        col2 = data.ghosts[num-1][0]+2
+        if data.cellColors[row][col]=="black" and \
+        data.cellColors[row][col2]=="black":
             return True
         else:
             data.ghosts[num-1][1] += 1
@@ -416,7 +438,11 @@ def validGhostMove(data,num):
     elif direction == "Down":
         data.ghosts[num-1][1] += 1
         #if the cell below is black, is valid to move
-        if data.cellColors[data.ghosts[num-1][1]+2][data.ghosts[num-1][0]-1]=="black":
+        row = data.ghosts[num-1][1]+2
+        col = data.ghosts[num-1][0]-1
+        col2 = data.ghosts[num-1][0]+2
+        if data.cellColors[row][col]=="black" and \
+        data.cellColors[row][col2] == "black":
             return True
         else:
             data.ghosts[num-1][1] -= 1
@@ -452,10 +478,10 @@ def moveGhost(data,num):
             direction = data.ghost2Direction
         if num == 3:
             direction = data.ghost3Direction
-        #rightCol = data.ghosts[num-1][0]+30
+        #rightCol = data.ghosts[num-1][0]+3
         #leftCol = data.ghosts[num-1][0]
         #topRow = data.ghosts[num-1][1]
-        #bottomRow = data.ghosts[num-1][1]+30
+        #bottomRow = data.ghosts[num-1][1]+3
         if direction == "Right":
             data.ghosts[num-1][0] += 1
             if data.ghosts[num-1][1] == 32 and data.ghosts[num-1][0]+3 > 59:
