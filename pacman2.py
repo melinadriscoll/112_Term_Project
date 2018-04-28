@@ -26,7 +26,7 @@ def init(data):
     data.timerDelay = 100
     data.coins = drawCoins(data)
     data.count = 0
-    data.score = -2
+    data.score = 0
     data.numRows = data.height//20
     data.numCols = data.width//20
     data.pacmanTopRow = 41
@@ -175,27 +175,27 @@ def redrawAll(canvas, data):
                     data.cellCount += 1
                 if data.cellCount == 3600:
                     data.cellCount = 0
-        #top left barrier
-        canvas.create_rectangle(110,110,200,158,fill="black",outline="blue")
-        #top middle barrier
-        canvas.create_rectangle(290,110,340,230,fill="black",outline="blue")
-        canvas.create_rectangle(200,230,438,260,fill="black",outline="blue")
-        #top right barrier
-        canvas.create_rectangle(420,110,518,170,fill="black",outline="blue")
-        #middle left barrier
-        canvas.create_rectangle(180,410,290,460,fill="black",outline="blue")
-        #middle right barrier
-        canvas.create_rectangle(340,410,440,460,fill="black",outline="blue")
-        #bottom left barrier
-        canvas.create_rectangle(110,470,178,520,fill="black",outline="blue")
-        canvas.create_rectangle(178,510,230,530,fill="black",outline="blue")
-        #bottom right barrier
-        canvas.create_rectangle(400,510,450,530,fill="black",outline="blue")
-        canvas.create_rectangle(450,470,520,520,fill="black",outline="blue")
-        #bottom middle barrier
-        canvas.create_rectangle(280,510,350,530,fill="black",outline="blue")
-        #draws where the ghosts stay
-        canvas.create_rectangle(260,288,380,350,fill="black",outline="red")
+        # #top left barrier
+        # canvas.create_rectangle(110,110,200,158,fill="black",outline="blue")
+        # #top middle barrier
+        # canvas.create_rectangle(290,110,340,230,fill="black",outline="blue")
+        # canvas.create_rectangle(200,230,438,260,fill="black",outline="blue")
+        # #top right barrier
+        # canvas.create_rectangle(420,110,518,170,fill="black",outline="blue")
+        # #middle left barrier
+        # canvas.create_rectangle(180,410,290,460,fill="black",outline="blue")
+        # #middle right barrier
+        # canvas.create_rectangle(340,410,440,460,fill="black",outline="blue")
+        # #bottom left barrier
+        # canvas.create_rectangle(110,470,178,520,fill="black",outline="blue")
+        # canvas.create_rectangle(178,510,230,530,fill="black",outline="blue")
+        # #bottom right barrier
+        # canvas.create_rectangle(400,510,450,530,fill="black",outline="blue")
+        # canvas.create_rectangle(450,470,520,520,fill="black",outline="blue")
+        # #bottom middle barrier
+        # canvas.create_rectangle(280,510,350,530,fill="black",outline="blue")
+        # #draws where the ghosts stay
+        # canvas.create_rectangle(260,288,380,350,fill="black",outline="red")
         #draws coins
         for coin in data.coins:
             canvas.create_oval(coin[0],coin[1],coin[2],coin[3],fill="pink")
@@ -248,7 +248,7 @@ def drawBoard(data):
     [],[],[],[],[],[],[],[],[],[],[],[],[],[],[]]
     for x in range(0,data.height,10):
         for y in range(0,60):
-            if (40 <= x <= 560 and 40 <= y*10 <= 50):
+            if (30 <= x <= 560 and 40 <= y*10 <= 50):
                 result[y].append("blue")
             elif (100 <= x <= 180 and 100 <= y*10 <= 140):
                 result[y].append("blue")
