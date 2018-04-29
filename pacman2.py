@@ -181,9 +181,9 @@ def timerFired(data):
                 data.ghosts[1][2] = "red"
                 data.ghosts[2][2] = "red"
             if data.redCount > 30 and data.redCount%2 != 0:
-                data.ghosts[0][2] = "black"
-                data.ghosts[1][2] = "black"
-                data.ghosts[2][2] = "black"
+                data.ghosts[0][2] = "white"
+                data.ghosts[1][2] = "white"
+                data.ghosts[2][2] = "white"
         if data.redCount == 40:
             data.switchRoles = False
             data.ghosts[0][2] = "tomato"
@@ -242,7 +242,7 @@ def redrawAll(canvas, data):
             canvas.create_oval(coin[0],coin[1],coin[2],coin[3],fill=coin[4])
         #draws the score
         scoreText = "Score: %d" % (data.score)
-        canvas.create_text(60,28,text=scoreText,fill="white",font="Arial 20")
+        canvas.create_text(63,28,text=scoreText,fill="white",font="Arial 20")
         #draws pac man
         canvas.create_oval(data.pacmanLeftCol*10,data.pacmanTopRow*10,
         data.pacmanRightCol*10,data.pacmanBottomRow*10,fill="yellow")
