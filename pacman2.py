@@ -48,6 +48,7 @@ def init(data):
     data.redCount = 0
     data.icon = PhotoImage(file="pacman.gif")
     data.coinsSpecial = []
+    data.normalGhosts = []
     
 def mousePressed(event, data):
     x = event.x
@@ -76,9 +77,11 @@ def keyPressed(event, data):
             if getCoins(data) == "special":
                 data.score += 5
                 data.switchRoles = True
-                data.ghosts[0][2] = "red"
-                data.ghosts[1][2] = "red"
-                data.ghosts[2][2] = "red"
+                count = 0
+                for ghost in data.ghosts:
+                    if not(ghost in data.normalGhosts):
+                        data.ghosts[count][2] = "red"
+                    count += 1
         if event.keysym == "Left":
             data.pacmanDirection = "Left"
             if validToMove(data):
@@ -88,9 +91,11 @@ def keyPressed(event, data):
             if getCoins(data) == "special" or len(data.coinsSpecial) != 0:
                 data.score += 5
                 data.switchRoles = True
-                data.ghosts[0][2] = "red"
-                data.ghosts[1][2] = "red"
-                data.ghosts[2][2] = "red"
+                count = 0
+                for ghost in data.ghosts:
+                    if not(ghost in data.normalGhosts):
+                        data.ghosts[count][2] = "red"
+                    count += 1
         if event.keysym == "Up":
             data.pacmanDirection = "Up"
             if validToMove(data):
@@ -100,9 +105,11 @@ def keyPressed(event, data):
             if getCoins(data) == "special" or len(data.coinsSpecial) != 0:
                 data.score += 5
                 data.switchRoles = True
-                data.ghosts[0][2] = "red"
-                data.ghosts[1][2] = "red"
-                data.ghosts[2][2] = "red"
+                count = 0
+                for ghost in data.ghosts:
+                    if not(ghost in data.normalGhosts):
+                        data.ghosts[count][2] = "red"
+                    count += 1
         if event.keysym == "Down":
             data.pacmanDirection = "Down"
             if validToMove(data):
@@ -112,9 +119,11 @@ def keyPressed(event, data):
             if getCoins(data) == "special":
                 data.score += 5
                 data.switchRoles = True
-                data.ghosts[0][2] = "red"
-                data.ghosts[1][2] = "red"
-                data.ghosts[2][2] = "red"
+                count = 0
+                for ghost in data.ghosts:
+                    if not(ghost in data.normalGhosts):
+                        data.ghosts[count][2] = "red"
+                    count += 1
     if data.loseState or data.winState:
         if event.keysym == "p":
             init(data)
@@ -138,9 +147,11 @@ def timerFired(data):
         #moves ghost one
         if data.count == 5:
             data.ghosts[0][1] = 26
+        #print(data.ghost1Direction)
         data.ghost1Direction = getBestDirection(data,1)
         if (data.count >= 5):
             if validGhostMove(data,1):
+                print("IS GONNA MOCE IUH")
                 moveGhost(data,1)
         #moves ghost two
         if data.count == 15:
@@ -148,6 +159,7 @@ def timerFired(data):
         data.ghost2Direction = getBestDirection(data,2)
         if (data.count >= 15):
             if validGhostMove(data,2):
+                print("IS GONNA MOCE IUH")
                 moveGhost(data,2)
         #moves ghost three
         if data.count == 30:
@@ -155,11 +167,12 @@ def timerFired(data):
         data.ghost3Direction = getBestDirection(data,3)
         if (data.count >= 30):
             if validGhostMove(data,3):
+                print("IS GONNA MOCE IUH")
                 moveGhost(data,3)
         if data.switchRoles:
             data.redCount += 1
             for ghost in data.ghosts:
-                if ghost[2] == "red" or ghost[2] == "white":
+                if not(ghost in data.normalGhosts):
                     if data.redCount > 30 and data.redCount%2 == 0:
                         data.ghosts[0][2] = "red"
                         data.ghosts[1][2] = "red"
@@ -170,6 +183,7 @@ def timerFired(data):
                         data.ghosts[2][2] = "white"
         if data.redCount == 40:
             data.coinsSpecial = []
+            data.normalGhosts = []
             data.switchRoles = False
             data.ghosts[0][2] = "tomato"
             data.ghosts[1][2] = "deepskyblue"
@@ -464,8 +478,6 @@ def validToMove(data):
         return True
         
 def validGhostMove(data,num):
-    #valid = ghostsCollide(data,num)
-    #if valid:
     if num == 1:
         direction = data.ghost1Direction
     if num == 2:
@@ -479,57 +491,73 @@ def validGhostMove(data,num):
     #avoids the ghost from running into any walls
     if direction == "Right":
         data.ghosts[num-1][0] += 1
-        if 31 <= data.ghosts[num-1][1] <= 34 and data.ghosts[num-1][0]+3 > 59:
-            data.ghosts[num-1][0] = 0
-        else:
-            #if the cell to the right is black, is valid to move
-            row = data.ghosts[num-1][1]-1
-            col = data.ghosts[num-1][0]+2
-            row2 = data.ghosts[num-1][1]+2
-            if data.cellColors[row][col]=="black" and \
-            data.cellColors[row2][col] == "black":
-                return True
+        if ghostsCollide(data,num) != False:
+            if 31 <= data.ghosts[num-1][1] <= 34 and data.ghosts[num-1][0]+3 > 59:
+                data.ghosts[num-1][0] = 0
             else:
-                data.ghosts[num-1][0] -= 1
-                return False
+                #if the cell to the right is black, is valid to move
+                row = data.ghosts[num-1][1]-1
+                col = data.ghosts[num-1][0]+2
+                row2 = data.ghosts[num-1][1]+2
+                if data.cellColors[row][col]=="black" and \
+                data.cellColors[row2][col] == "black":
+                    return True
+                else:
+                    data.ghosts[num-1][0] -= 1
+                    return False
+        if ghostsCollide(data,num):
+            data.ghosts[num-1][0] -= 3
+            return False
     elif direction == "Left":
         data.ghosts[num-1][0] -= 1
-        if 31 <= data.ghosts[num-1][1] <= 34 and data.ghosts[num-1][0] < 0:
-            data.ghosts[num-1][0] = 56
-        else:
-            #if the cell to the left is black, is valid to move
-            row = data.ghosts[num-1][1]-1
-            col = data.ghosts[num-1][0]-1
-            row2 = data.ghosts[num-1][1]+2
-            if data.cellColors[row][col]=="black" and \
-            data.cellColors[row2][col]=="black":
-                return True
+        if ghostsCollide(data,num) != False:
+            if 31 <= data.ghosts[num-1][1] <= 34 and data.ghosts[num-1][0] < 0:
+                data.ghosts[num-1][0] = 56
             else:
-                data.ghosts[num-1][0] += 1
-                return False
+                #if the cell to the left is black, is valid to move
+                row = data.ghosts[num-1][1]-1
+                col = data.ghosts[num-1][0]-1
+                row2 = data.ghosts[num-1][1]+2
+                if data.cellColors[row][col]=="black" and \
+                data.cellColors[row2][col]=="black":
+                    return True
+                else:
+                    data.ghosts[num-1][0] += 1
+                    return False
+        if ghostsCollide(data,num):
+            data.ghosts[num-1][0] += 3
+            return False
     elif direction == "Up":
         data.ghosts[num-1][1] -= 1
-        #if the cell above is black, is valid to move
-        row = data.ghosts[num-1][1]-1
-        col = data.ghosts[num-1][0]-1
-        col2 = data.ghosts[num-1][0]+2
-        if data.cellColors[row][col]=="black" and \
-        data.cellColors[row][col2]=="black":
-            return True
-        else:
-            data.ghosts[num-1][1] += 1
+        if ghostsCollide(data,num) != False:
+            #if the cell above is black, is valid to move
+            row = data.ghosts[num-1][1]-1
+            col = data.ghosts[num-1][0]-1
+            col2 = data.ghosts[num-1][0]+2
+            if data.cellColors[row][col]=="black" and \
+            data.cellColors[row][col2]=="black":
+                return True
+            else:
+                data.ghosts[num-1][1] += 1
+                return False
+        if ghostsCollide(data,num):
+            data.ghosts[num-1][1] += 3
             return False
     elif direction == "Down":
         data.ghosts[num-1][1] += 1
-        #if the cell below is black, is valid to move
-        row = data.ghosts[num-1][1]+2
-        col = data.ghosts[num-1][0]-1
-        col2 = data.ghosts[num-1][0]+2
-        if data.cellColors[row][col]=="black" and \
-        data.cellColors[row][col2] == "black":
-            return True
-        else:
-            data.ghosts[num-1][1] -= 1
+        if ghostsCollide(data,num) != False:
+            #if the cell below is black, is valid to move
+            row = data.ghosts[num-1][1]+2
+            col = data.ghosts[num-1][0]-1
+            col2 = data.ghosts[num-1][0]+2
+            if data.cellColors[row][col]=="black" and \
+            data.cellColors[row][col2] == "black":
+                return True
+            else:
+                data.ghosts[num-1][1] -= 1
+                return False
+        if ghostsCollide(data,num):
+            data.ghosts[num-1][1] -= 3
             return False
     else:
         return True
@@ -638,12 +666,9 @@ def getCoins(data):
                 data.coins.remove(coin)
                 if coin[4] == "red":
                     data.coinsSpecial.append(coin)
-                    print("special")
                     return "special"
                 else:
-                    print("regular")
                     return "regular"
-    print("no coin")
     
 def checkCollisions(data):
     if data.switchRoles == False:
@@ -654,7 +679,7 @@ def checkCollisions(data):
             ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
                 data.gameState = False
                 data.loseState = True
-    else:
+    if data.switchRoles:
         count = -1
         for ghost in data.ghosts:
             count += 1
@@ -666,9 +691,9 @@ def checkCollisions(data):
                 ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
                 (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
                 ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
-                    if data.ghosts[count][2] == "red" or \
-                    data.ghosts[count][2] == "white":
+                    if not(ghost in data.normalGhosts):
                         data.score += 10
+                        data.normalGhosts.append(ghost)
                         data.ghosts[count][2] = color
                         data.ghosts[count][0] = row
                         data.ghosts[count][1] = col
@@ -683,9 +708,9 @@ def checkCollisions(data):
                 ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
                 (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
                 ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
-                    if data.ghosts[count][2] == "red" or \
-                    data.ghosts[count][2] == "white":
+                    if not(ghost in data.normalGhosts):
                         data.score += 10
+                        data.normalGhosts.append(ghost)
                         data.ghosts[count][2] = color
                         data.ghosts[count][0] = row
                         data.ghosts[count][1] = col
@@ -700,9 +725,9 @@ def checkCollisions(data):
                 ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
                 (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
                 ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
-                    if data.ghosts[count][2] == "red" or \
-                    data.ghosts[count][2] == "white":
+                    if not(ghost in data.normalGhosts):
                         data.score += 10
+                        data.normalGhosts.append(ghost)
                         data.ghosts[count][2] = color
                         data.ghosts[count][0] = row
                         data.ghosts[count][1] = col
@@ -767,7 +792,7 @@ def getBestDirection(data,ghost):
             data.ghosts[ghost-1][1] -= 2
             if distance < bestDistance:
                 if direction == "Left":
-                    print("prior was left")
+                    #print("prior was left")
                     data.ghosts[num-1][0] -= 2
                 if direction == "Right":
                     data.ghosts[num-1][0] += 2
@@ -777,38 +802,28 @@ def getBestDirection(data,ghost):
     
 def ghostsCollide(data,num):
     if num == 1:
-        if data.ghosts[1][0] <= data.ghosts[0][0] <= data.ghosts[1][0]+30 \
-        and data.ghosts[1][1] <= data.ghosts[0][1] <= data.ghosts[1][1]+30:
-            print("one")
-            valid = False
-            return False
-        if data.ghosts[2][0] <= data.ghosts[0][0] <= data.ghosts[2][0]+30 \
-        and data.ghosts[2][1] <= data.ghosts[0][1] <= data.ghosts[2][1]+30:
-            print("two")
-            valid = False
-            return False
+        print(data.ghosts[1][0])
+        if data.ghosts[1][0] <= data.ghosts[0][0] <= data.ghosts[1][0]+3 \
+        and data.ghosts[1][1] <= data.ghosts[0][1] <= data.ghosts[1][1]+3:
+            print("run into one ghost")
+            return True
+        if data.ghosts[2][0] <= data.ghosts[0][0] <= data.ghosts[2][0]+3 \
+        and data.ghosts[2][1] <= data.ghosts[0][1] <= data.ghosts[2][1]+3:
+            return True
     if num == 2:
-        if data.ghosts[0][0] <= data.ghosts[1][0] <= data.ghosts[0][0]+30 \
-        and data.ghosts[0][1] <= data.ghosts[1][1] <= data.ghosts[0][1]+30:
-            print("one")
-            valid = False
-            return False
-        if data.ghosts[2][0] <= data.ghosts[1][0] <= data.ghosts[2][0]+30 \
-        and data.ghosts[2][1] <= data.ghosts[1][1] <= data.ghosts[2][1]+30:
-            print("two")
-            valid = False
-            return False
+        if data.ghosts[0][0] <= data.ghosts[1][0] <= data.ghosts[0][0]+3 \
+        and data.ghosts[0][1] <= data.ghosts[1][1] <= data.ghosts[0][1]+3:
+            return True
+        if data.ghosts[2][0] <= data.ghosts[1][0] <= data.ghosts[2][0]+3 \
+        and data.ghosts[2][1] <= data.ghosts[1][1] <= data.ghosts[2][1]+3:
+            return True
     if num == 3:
-        if data.ghosts[0][0] <= data.ghosts[2][0] <= data.ghosts[0][0]+30 \
-        and data.ghosts[0][1] <= data.ghosts[2][1] <= data.ghosts[0][1]+30:
-            print("one")
-            valid = False
-            return False
-        if data.ghosts[1][0] <= data.ghosts[2][0] <= data.ghosts[1][0]+30 \
-        and data.ghosts[1][1] <= data.ghosts[2][1] <= data.ghosts[1][1]+30:
-            print("two")
-            valid = False
-            return False
+        if data.ghosts[0][0] <= data.ghosts[2][0] <= data.ghosts[0][0]+3 \
+        and data.ghosts[0][1] <= data.ghosts[2][1] <= data.ghosts[0][1]+3:
+            return True
+        if data.ghosts[1][0] <= data.ghosts[2][0] <= data.ghosts[1][0]+3 \
+        and data.ghosts[1][1] <= data.ghosts[2][1] <= data.ghosts[1][1]+3:
+            return True
             
 ####################################
 # use the run function as-is
