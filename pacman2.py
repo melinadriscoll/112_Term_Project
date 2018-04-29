@@ -44,6 +44,7 @@ def init(data):
     data.ghost2Direction = None
     data.ghost3Direction = None
     data.switchRoles = False
+    data.redCount = 0
     
 def mousePressed(event, data):
     x = event.x
@@ -82,6 +83,7 @@ def keyPressed(event, data):
                 movePacman(data)
             if getCoins(data) == "regular":
                 data.score += 1
+            print(getCoins(data))
             if getCoins(data) == "special":
                 data.score += 5
                 data.switchRoles = True
@@ -93,6 +95,7 @@ def keyPressed(event, data):
             data.pacmanDirection = "Up"
             if validToMove(data):
                 movePacman(data)
+            print(getCoins(data))
             if getCoins(data) == "regular":
                 data.score += 1
             if getCoins(data) == "special":
@@ -171,6 +174,23 @@ def timerFired(data):
                 data.ghost3Direction = data.directions[randomIndex]
                 if validGhostMove(data,3):
                     moveGhost(data,3)
+        if data.switchRoles:
+            data.redCount += 1
+            print(data.redCount)
+            if data.redCount > 30 and data.redCount%2 == 0:
+                data.ghosts[0][2] = "red"
+                data.ghosts[1][2] = "red"
+                data.ghosts[2][2] = "red"
+            if data.redCount > 30 and data.redCount%2 != 0:
+                data.ghosts[0][2] = "black"
+                data.ghosts[1][2] = "black"
+                data.ghosts[2][2] = "black"
+        if data.redCount == 40:
+            data.switchRoles = False
+            data.ghosts[0][2] = "tomato"
+            data.ghosts[1][2] = "deepskyblue"
+            data.ghosts[2][2] = "magenta"
+            data.redCount = 0
         checkCollisions(data)
 
 def redrawAll(canvas, data):
@@ -595,8 +615,10 @@ def drawCoins(data):
         
 def getCoins(data):
     for coin in data.coins:
-        if data.pacmanLeftCol <= coin[0]//10 <= data.pacmanRightCol:
-            if data.pacmanTopRow <= coin[1]//10 <= data.pacmanBottomRow:
+        if data.pacmanLeftCol <= coin[0]//10 <= data.pacmanRightCol or \
+        data.pacmanLeftCol <= (coin[0]+10)//10 <= data.pacmanRightCol:
+            if data.pacmanTopRow <= coin[1]//10 <= data.pacmanBottomRow or \
+            data.pacmanTopRow <= (coin[1]+10)//10 <= data.pacmanBottomRow:
                 data.coins.remove(coin)
                 if coin[4] == "red":
                     print("special")
@@ -618,17 +640,42 @@ def checkCollisions(data):
         count = -1
         for ghost in data.ghosts:
             count += 1
-            color = ghost[2]
-            row = ghost[0]
-            col = ghost[1]
-            if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
-            ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
-            (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
-            ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
-                data.score += 10
-                data.ghosts[count][2] = color
-                data.ghosts[count][0] = row
-                data.ghosts[count][1] = col
+            if count == 0:
+                row = 26
+                col = 30
+                color = "tomato"
+                if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
+                ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
+                (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
+                ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
+                    data.score += 10
+                    #data.ghosts[count][2] = color
+                    data.ghosts[count][0] = row
+                    data.ghosts[count][1] = col
+            if count == 1:
+                row = 30
+                col = 30
+                color = "deepskyblue"
+                if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
+                ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
+                (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
+                ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
+                    data.score += 10
+                    #data.ghosts[count][2] = color
+                    data.ghosts[count][0] = row
+                    data.ghosts[count][1] = col
+            if count == 2:
+                row = 34
+                col = 30
+                color = "magenta"
+                if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
+                ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
+                (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
+                ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
+                    data.score += 10
+                    #data.ghosts[count][2] = color
+                    data.ghosts[count][0] = row
+                    data.ghosts[count][1] = col
             
 ####################################
 # use the run function as-is
