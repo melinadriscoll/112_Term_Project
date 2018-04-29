@@ -2,6 +2,7 @@
 # Melina Driscoll, msdrisco
 
 import random
+import math
 from tkinter import *
 
 def init(data):
@@ -45,6 +46,7 @@ def init(data):
     data.ghost3Direction = None
     data.switchRoles = False
     data.redCount = 0
+    data.icon = PhotoImage(file="pacman.gif")
     
 def mousePressed(event, data):
     x = event.x
@@ -141,39 +143,24 @@ def timerFired(data):
         #moves ghost one
         if data.count == 5:
             data.ghosts[0][1] = 26
-        data.ghost1Direction = "Right"
+        data.ghost1Direction = getBestDirection(data,1)
         if (data.count >= 5):
             if validGhostMove(data,1):
                 moveGhost(data,1)
-            else:
-                randomIndex = random.randint(0,len(data.directions)-1)
-                data.ghost1Direction = data.directions[randomIndex]
-                if validGhostMove(data,1):
-                    moveGhost(data,1)
         #moves ghost two
         if data.count == 15:
             data.ghosts[1][1] = 26
-        data.ghost2Direction = "Left"
+        data.ghost2Direction = getBestDirection(data,2)
         if (data.count >= 15):
             if validGhostMove(data,2):
                 moveGhost(data,2)
-            else:
-                randomIndex = random.randint(0,len(data.directions)-1)
-                data.ghost2Direction = data.directions[randomIndex]
-                if validGhostMove(data,2):
-                    moveGhost(data,2)
         #moves ghost three
         if data.count == 30:
             data.ghosts[2][1] = 26
-        data.ghost3Direction = "Right"
+        data.ghost3Direction = getBestDirection(data,3)
         if (data.count >= 30):
             if validGhostMove(data,3):
                 moveGhost(data,3)
-            else:
-                randomIndex = random.randint(0,len(data.directions)-1)
-                data.ghost3Direction = data.directions[randomIndex]
-                if validGhostMove(data,3):
-                    moveGhost(data,3)
         if data.switchRoles:
             data.redCount += 1
             if data.redCount > 30 and data.redCount%2 == 0:
@@ -244,8 +231,10 @@ def redrawAll(canvas, data):
         scoreText = "Score: %d" % (data.score)
         canvas.create_text(63,28,text=scoreText,fill="white",font="Arial 20")
         #draws pac man
-        canvas.create_oval(data.pacmanLeftCol*10,data.pacmanTopRow*10,
-        data.pacmanRightCol*10,data.pacmanBottomRow*10,fill="yellow")
+        canvas.create_image(data.width//8, data.height//8, anchor=NW, 
+        image=data.icon)
+        # canvas.create_oval(data.pacmanLeftCol*10,data.pacmanTopRow*10,
+        # data.pacmanRightCol*10,data.pacmanBottomRow*10,fill="yellow")
         #draws ghosts
         for ghost in data.ghosts:
             canvas.create_oval(ghost[0]*10,ghost[1]*10,ghost[0]*10+30,
@@ -478,6 +467,8 @@ def validToMove(data):
         return True
         
 def validGhostMove(data,num):
+    #valid = ghostsCollide(data,num)
+    #if valid:
     if num == 1:
         direction = data.ghost1Direction
     if num == 2:
@@ -700,6 +691,106 @@ def checkCollisions(data):
                     #data.ghosts[count][2] = color
                     data.ghosts[count][0] = row
                     data.ghosts[count][1] = col
+                    
+def getBestDirection(data,ghost):
+    bestDistance = 10000
+    bestDirection = None
+    if ghost == 1:
+        direction = data.ghost1Direction
+    if ghost == 2:
+        direction = data.ghost2Direction
+    if ghost == 3:
+        direction = data.ghost3Direction
+    for direction in data.directions:
+        if direction == "Left":
+            data.ghosts[ghost-1][0] -= 2
+            distanceCols = math.fabs(data.pacmanLeftCol - \
+            data.ghosts[ghost-1][0])
+            distanceRows = math.fabs(data.pacmanTopRow - \
+            data.ghosts[ghost-1][1])
+            distance = distanceCols + distanceRows
+            data.ghosts[ghost-1][0] += 2
+            if distance < bestDistance:
+                bestDistance = distance
+                bestDirection = "Left"
+        if direction == "Right":
+            data.ghosts[ghost-1][0] += 2
+            distanceCols = math.fabs(data.pacmanLeftCol - \
+            data.ghosts[ghost-1][0])
+            distanceRows = math.fabs(data.pacmanTopRow - \
+            data.ghosts[ghost-1][1])
+            distance = distanceCols + distanceRows
+            data.ghosts[ghost-1][0] -= 2
+            if distance < bestDistance:
+                bestDistance = distance
+                bestDirection = "Right"
+        if direction == "Up":
+            data.ghosts[ghost-1][1] -= 2
+            distanceCols = math.fabs(data.pacmanLeftCol - \
+            data.ghosts[ghost-1][0])
+            distanceRows = math.fabs(data.pacmanTopRow - \
+            data.ghosts[ghost-1][1])
+            distance = distanceCols + distanceRows
+            data.ghosts[ghost-1][1] += 2
+            if distance < bestDistance:
+                if direction == "Left":
+                    data.ghosts[num-1][0] -= 2
+                if direction == "Right":
+                    data.ghosts[num-1][0] += 2
+                bestDistance = distance
+                bestDirection = "Up"
+        if direction == "Down":
+            data.ghosts[ghost-1][1] += 2
+            distanceCols = math.fabs(data.pacmanLeftCol - \
+            data.ghosts[ghost-1][0])
+            distanceRows = math.fabs(data.pacmanTopRow - \
+            data.ghosts[ghost-1][1])
+            distance = distanceCols + distanceRows
+            data.ghosts[ghost-1][1] -= 2
+            if distance < bestDistance:
+                if direction == "Left":
+                    print("prior was left")
+                    data.ghosts[num-1][0] -= 2
+                if direction == "Right":
+                    data.ghosts[num-1][0] += 2
+                bestDistance = distance
+                bestDirection = "Down"
+    return bestDirection
+    
+def ghostsCollide(data,num):
+    if num == 1:
+        if data.ghosts[1][0] <= data.ghosts[0][0] <= data.ghosts[1][0]+30 \
+        and data.ghosts[1][1] <= data.ghosts[0][1] <= data.ghosts[1][1]+30:
+            print("one")
+            valid = False
+            return False
+        if data.ghosts[2][0] <= data.ghosts[0][0] <= data.ghosts[2][0]+30 \
+        and data.ghosts[2][1] <= data.ghosts[0][1] <= data.ghosts[2][1]+30:
+            print("two")
+            valid = False
+            return False
+    if num == 2:
+        if data.ghosts[0][0] <= data.ghosts[1][0] <= data.ghosts[0][0]+30 \
+        and data.ghosts[0][1] <= data.ghosts[1][1] <= data.ghosts[0][1]+30:
+            print("one")
+            valid = False
+            return False
+        if data.ghosts[2][0] <= data.ghosts[1][0] <= data.ghosts[2][0]+30 \
+        and data.ghosts[2][1] <= data.ghosts[1][1] <= data.ghosts[2][1]+30:
+            print("two")
+            valid = False
+            return False
+    if num == 3:
+        if data.ghosts[0][0] <= data.ghosts[2][0] <= data.ghosts[0][0]+30 \
+        and data.ghosts[0][1] <= data.ghosts[2][1] <= data.ghosts[0][1]+30:
+            print("one")
+            valid = False
+            return False
+        if data.ghosts[1][0] <= data.ghosts[2][0] <= data.ghosts[1][0]+30 \
+        and data.ghosts[1][1] <= data.ghosts[2][1] <= data.ghosts[1][1]+30:
+            print("two")
+            valid = False
+            return False
             
 ####################################
 # use the run function as-is
