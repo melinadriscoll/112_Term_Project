@@ -47,6 +47,7 @@ def init(data):
     data.switchRoles = False
     data.redCount = 0
     data.icon = PhotoImage(file="pacman.gif")
+    data.coinsSpecial = []
     
 def mousePressed(event, data):
     x = event.x
@@ -75,7 +76,6 @@ def keyPressed(event, data):
             if getCoins(data) == "special":
                 data.score += 5
                 data.switchRoles = True
-                #print("right true")
                 data.ghosts[0][2] = "red"
                 data.ghosts[1][2] = "red"
                 data.ghosts[2][2] = "red"
@@ -85,11 +85,9 @@ def keyPressed(event, data):
                 movePacman(data)
             if getCoins(data) == "regular":
                 data.score += 1
-            #print(getCoins(data))
-            if getCoins(data) == "special":
+            if getCoins(data) == "special" or len(data.coinsSpecial) != 0:
                 data.score += 5
                 data.switchRoles = True
-                #print("left true")
                 data.ghosts[0][2] = "red"
                 data.ghosts[1][2] = "red"
                 data.ghosts[2][2] = "red"
@@ -97,13 +95,11 @@ def keyPressed(event, data):
             data.pacmanDirection = "Up"
             if validToMove(data):
                 movePacman(data)
-            #print(getCoins(data))
             if getCoins(data) == "regular":
                 data.score += 1
-            if getCoins(data) == "special":
+            if getCoins(data) == "special" or len(data.coinsSpecial) != 0:
                 data.score += 5
                 data.switchRoles = True
-                #print("up true")
                 data.ghosts[0][2] = "red"
                 data.ghosts[1][2] = "red"
                 data.ghosts[2][2] = "red"
@@ -116,7 +112,6 @@ def keyPressed(event, data):
             if getCoins(data) == "special":
                 data.score += 5
                 data.switchRoles = True
-                #print("down true")
                 data.ghosts[0][2] = "red"
                 data.ghosts[1][2] = "red"
                 data.ghosts[2][2] = "red"
@@ -163,15 +158,18 @@ def timerFired(data):
                 moveGhost(data,3)
         if data.switchRoles:
             data.redCount += 1
-            if data.redCount > 30 and data.redCount%2 == 0:
-                data.ghosts[0][2] = "red"
-                data.ghosts[1][2] = "red"
-                data.ghosts[2][2] = "red"
-            if data.redCount > 30 and data.redCount%2 != 0:
-                data.ghosts[0][2] = "white"
-                data.ghosts[1][2] = "white"
-                data.ghosts[2][2] = "white"
+            for ghost in data.ghosts:
+                if ghost[2] == "red" or ghost[2] == "white":
+                    if data.redCount > 30 and data.redCount%2 == 0:
+                        data.ghosts[0][2] = "red"
+                        data.ghosts[1][2] = "red"
+                        data.ghosts[2][2] = "red"
+                    if data.redCount > 30 and data.redCount%2 != 0:
+                        data.ghosts[0][2] = "white"
+                        data.ghosts[1][2] = "white"
+                        data.ghosts[2][2] = "white"
         if data.redCount == 40:
+            data.coinsSpecial = []
             data.switchRoles = False
             data.ghosts[0][2] = "tomato"
             data.ghosts[1][2] = "deepskyblue"
@@ -231,10 +229,10 @@ def redrawAll(canvas, data):
         scoreText = "Score: %d" % (data.score)
         canvas.create_text(63,28,text=scoreText,fill="white",font="Arial 20")
         #draws pac man
-        canvas.create_image(data.width//8, data.height//8, anchor=NW, 
-        image=data.icon)
-        # canvas.create_oval(data.pacmanLeftCol*10,data.pacmanTopRow*10,
-        # data.pacmanRightCol*10,data.pacmanBottomRow*10,fill="yellow")
+        # canvas.create_image(data.width//8, data.height//8, anchor=NW, 
+        # image=data.icon)
+        canvas.create_oval(data.pacmanLeftCol*10,data.pacmanTopRow*10,
+        data.pacmanRightCol*10,data.pacmanBottomRow*10,fill="yellow")
         #draws ghosts
         for ghost in data.ghosts:
             canvas.create_oval(ghost[0]*10,ghost[1]*10,ghost[0]*10+30,
@@ -441,7 +439,6 @@ def validToMove(data):
             data.pacmanBottomRow += 2
             return False
     elif data.pacmanDirection == "Down":
-        print(data.pacmanTopRow,data.pacmanLeftCol)
         data.pacmanTopRow += 2
         data.pacmanBottomRow += 2
         if 49 < data.pacmanBottomRow <= 52 and 28 < data.pacmanLeftCol < 33:
@@ -630,17 +627,23 @@ def drawCoins(data):
         
 def getCoins(data):
     for coin in data.coins:
-        if data.pacmanLeftCol <= coin[0]//10 <= data.pacmanRightCol or \
-        data.pacmanLeftCol <= (coin[0]+10)//10 <= data.pacmanRightCol:
-            if data.pacmanTopRow <= coin[1]//10 <= data.pacmanBottomRow or \
-            data.pacmanTopRow <= (coin[1]+10)//10 <= data.pacmanBottomRow:
+        leftcol = coin[0]//10
+        rightcol = (coin[0]+10)//10
+        toprow = coin[1]//10
+        bottomrow = (coin[1]+10)//10
+        if data.pacmanLeftCol <= leftcol <= data.pacmanRightCol or \
+        data.pacmanLeftCol <= rightcol <= data.pacmanRightCol:
+            if data.pacmanTopRow <= toprow <= data.pacmanBottomRow or \
+            data.pacmanTopRow <= bottomrow <= data.pacmanBottomRow:
                 data.coins.remove(coin)
                 if coin[4] == "red":
+                    data.coinsSpecial.append(coin)
                     print("special")
                     return "special"
                 else:
+                    print("regular")
                     return "regular"
-    return False
+    print("no coin")
     
 def checkCollisions(data):
     if data.switchRoles == False:
@@ -663,10 +666,15 @@ def checkCollisions(data):
                 ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
                 (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
                 ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
-                    data.score += 10
-                    #data.ghosts[count][2] = color
-                    data.ghosts[count][0] = row
-                    data.ghosts[count][1] = col
+                    if data.ghosts[count][2] == "red" or \
+                    data.ghosts[count][2] == "white":
+                        data.score += 10
+                        data.ghosts[count][2] = color
+                        data.ghosts[count][0] = row
+                        data.ghosts[count][1] = col
+                    else:
+                        data.gameState = False
+                        data.loseState = True
             if count == 1:
                 row = 27
                 col = 33
@@ -675,10 +683,15 @@ def checkCollisions(data):
                 ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
                 (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
                 ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
-                    data.score += 10
-                    #data.ghosts[count][2] = color
-                    data.ghosts[count][0] = row
-                    data.ghosts[count][1] = col
+                    if data.ghosts[count][2] == "red" or \
+                    data.ghosts[count][2] == "white":
+                        data.score += 10
+                        data.ghosts[count][2] = color
+                        data.ghosts[count][0] = row
+                        data.ghosts[count][1] = col
+                    else:
+                        data.gameState = False
+                        data.loseState = True
             if count == 2:
                 row = 31
                 col = 33
@@ -687,10 +700,15 @@ def checkCollisions(data):
                 ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
                 (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
                 ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
-                    data.score += 10
-                    #data.ghosts[count][2] = color
-                    data.ghosts[count][0] = row
-                    data.ghosts[count][1] = col
+                    if data.ghosts[count][2] == "red" or \
+                    data.ghosts[count][2] == "white":
+                        data.score += 10
+                        data.ghosts[count][2] = color
+                        data.ghosts[count][0] = row
+                        data.ghosts[count][1] = col
+                    else:
+                        data.gameState = False
+                        data.loseState = True
                     
 def getBestDirection(data,ghost):
     bestDistance = 10000
