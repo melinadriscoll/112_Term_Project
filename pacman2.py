@@ -38,7 +38,7 @@ def init(data):
     data.pacman = [data.pacmanCenterX-15,data.pacmanCenterY-15,
     data.pacmanCenterX+15,data.pacmanCenterY+15]
     data.pacmanDirection = None
-    data.ghosts = [[26,30,"tomato"],[30,30,"deepskyblue"],[34,30,"magenta"]]
+    data.ghosts = [[29,30,"tomato"],[27,33,"deepskyblue"],[31,33,"magenta"]]
     data.directions = ["Right", "Left", "Up", "Down"]
     data.ghost1Direction = None
     data.ghost2Direction = None
@@ -73,7 +73,7 @@ def keyPressed(event, data):
             if getCoins(data) == "special":
                 data.score += 5
                 data.switchRoles = True
-                print("right true")
+                #print("right true")
                 data.ghosts[0][2] = "red"
                 data.ghosts[1][2] = "red"
                 data.ghosts[2][2] = "red"
@@ -83,11 +83,11 @@ def keyPressed(event, data):
                 movePacman(data)
             if getCoins(data) == "regular":
                 data.score += 1
-            print(getCoins(data))
+            #print(getCoins(data))
             if getCoins(data) == "special":
                 data.score += 5
                 data.switchRoles = True
-                print("left true")
+                #print("left true")
                 data.ghosts[0][2] = "red"
                 data.ghosts[1][2] = "red"
                 data.ghosts[2][2] = "red"
@@ -95,13 +95,13 @@ def keyPressed(event, data):
             data.pacmanDirection = "Up"
             if validToMove(data):
                 movePacman(data)
-            print(getCoins(data))
+            #print(getCoins(data))
             if getCoins(data) == "regular":
                 data.score += 1
             if getCoins(data) == "special":
                 data.score += 5
                 data.switchRoles = True
-                print("up true")
+                #print("up true")
                 data.ghosts[0][2] = "red"
                 data.ghosts[1][2] = "red"
                 data.ghosts[2][2] = "red"
@@ -114,7 +114,7 @@ def keyPressed(event, data):
             if getCoins(data) == "special":
                 data.score += 5
                 data.switchRoles = True
-                print("down true")
+                #print("down true")
                 data.ghosts[0][2] = "red"
                 data.ghosts[1][2] = "red"
                 data.ghosts[2][2] = "red"
@@ -176,7 +176,6 @@ def timerFired(data):
                     moveGhost(data,3)
         if data.switchRoles:
             data.redCount += 1
-            print(data.redCount)
             if data.redCount > 30 and data.redCount%2 == 0:
                 data.ghosts[0][2] = "red"
                 data.ghosts[1][2] = "red"
@@ -313,7 +312,7 @@ def drawBoard(data):
                 result[y].append("blue")
             #ghost home
             elif (260 <= x <= 330 and 290 <= y*10 <= 350):
-                result[y].append("blue")
+                result[y].append("cornflowerblue")
             #topmiddle left box
             elif (140 <= x <= 200 and 290 <= y*10 <= 350):
                 result[y].append("blue")
@@ -392,6 +391,16 @@ def validToMove(data):
         if 31 <= data.pacmanTopRow <= 34 and data.pacmanRightCol > 59:
             data.pacmanLeftCol = 2
             data.pacmanRightCol = 5
+        elif 50 <= data.pacmanTopRow <= 51 and \
+        (38 < data.pacmanRightCol > 51 or 9 < data.pacmanRightCol > 21 or \
+        27 < data.pacmanRightCol > 33):
+            data.pacmanRightCol -= 2
+            data.pacmanLeftCol -= 2
+            return False
+        elif 7 <= data.pacmanTopRow <= 21 and 25 <= data.pacmanRightCol < 35:
+            data.pacmanRightCol -= 2
+            data.pacmanLeftCol -= 2
+            return False
         else:
             #if the cell to the right is black, is valid to move
             row = data.pacmanTopRow-1
@@ -410,6 +419,12 @@ def validToMove(data):
         if 31 <= data.pacmanTopRow <= 34 and data.pacmanLeftCol < 0:
             data.pacmanLeftCol = 55
             data.pacmanRightCol = 58
+        elif 50 <= data.pacmanTopRow <= 51 and \
+        (38 < data.pacmanLeftCol > 51 or 9 < data.pacmanRightCol > 22 or \
+        27 < data.pacmanRightCol > 34):
+            data.pacmanRightCol += 2
+            data.pacmanLeftCol += 2
+            return False
         else:
             #if the cell to the left is black, is valid to move
             row = data.pacmanTopRow-1
@@ -437,8 +452,17 @@ def validToMove(data):
             data.pacmanBottomRow += 2
             return False
     elif data.pacmanDirection == "Down":
+        print(data.pacmanTopRow,data.pacmanLeftCol)
         data.pacmanTopRow += 2
         data.pacmanBottomRow += 2
+        if 49 < data.pacmanBottomRow <= 52 and 28 < data.pacmanLeftCol < 33:
+            data.pacmanTopRow -= 2
+            data.pacmanBottomRow -= 2
+            return False
+        elif 6 <= data.pacmanTopRow <= 21 and 29 <= data.pacmanLeftCol < 31:
+            data.pacmanTopRow -= 2
+            data.pacmanBottomRow -= 2
+            return False
         #if the cell below is black, is valid to move
         row = data.pacmanBottomRow-1
         col = data.pacmanLeftCol-1
@@ -641,7 +665,7 @@ def checkCollisions(data):
         for ghost in data.ghosts:
             count += 1
             if count == 0:
-                row = 26
+                row = 29
                 col = 30
                 color = "tomato"
                 if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
@@ -653,8 +677,8 @@ def checkCollisions(data):
                     data.ghosts[count][0] = row
                     data.ghosts[count][1] = col
             if count == 1:
-                row = 30
-                col = 30
+                row = 27
+                col = 33
                 color = "deepskyblue"
                 if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
                 ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
@@ -665,8 +689,8 @@ def checkCollisions(data):
                     data.ghosts[count][0] = row
                     data.ghosts[count][1] = col
             if count == 2:
-                row = 34
-                col = 30
+                row = 31
+                col = 33
                 color = "magenta"
                 if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
                 ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
