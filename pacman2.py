@@ -46,9 +46,9 @@ def init(data):
     data.ghost3Direction = None
     data.switchRoles = False
     data.redCount = 0
-    data.icon = PhotoImage(file="pacman.gif")
     data.coinsSpecial = []
     data.normalGhosts = []
+    data.picture = PhotoImage(file="pacman1.gif")
     
 def mousePressed(event, data):
     x = event.x
@@ -147,11 +147,9 @@ def timerFired(data):
         #moves ghost one
         if data.count == 5:
             data.ghosts[0][1] = 26
-        #print(data.ghost1Direction)
         data.ghost1Direction = getBestDirection(data,1)
         if (data.count >= 5):
             if validGhostMove(data,1):
-                print("IS GONNA MOCE IUH")
                 moveGhost(data,1)
         #moves ghost two
         if data.count == 15:
@@ -159,7 +157,6 @@ def timerFired(data):
         data.ghost2Direction = getBestDirection(data,2)
         if (data.count >= 15):
             if validGhostMove(data,2):
-                print("IS GONNA MOCE IUH")
                 moveGhost(data,2)
         #moves ghost three
         if data.count == 30:
@@ -167,7 +164,6 @@ def timerFired(data):
         data.ghost3Direction = getBestDirection(data,3)
         if (data.count >= 30):
             if validGhostMove(data,3):
-                print("IS GONNA MOCE IUH")
                 moveGhost(data,3)
         if data.switchRoles:
             data.redCount += 1
@@ -243,14 +239,34 @@ def redrawAll(canvas, data):
         scoreText = "Score: %d" % (data.score)
         canvas.create_text(63,28,text=scoreText,fill="white",font="Arial 20")
         #draws pac man
-        # canvas.create_image(data.width//8, data.height//8, anchor=NW, 
-        # image=data.icon)
         canvas.create_oval(data.pacmanLeftCol*10,data.pacmanTopRow*10,
         data.pacmanRightCol*10,data.pacmanBottomRow*10,fill="yellow")
+        if data.pacmanDirection == "Right" or data.pacmanDirection == None:
+            canvas.create_polygon(data.pacmanRightCol*10, data.pacmanTopRow*10,
+            data.pacmanRightCol*10,data.pacmanBottomRow*10,
+            data.pacmanRightCol*10-15,data.pacmanTopRow*10+15,fill="black")
+        if data.pacmanDirection == "Left":
+            canvas.create_polygon(data.pacmanLeftCol*10, data.pacmanTopRow*10,
+            data.pacmanLeftCol*10,data.pacmanBottomRow*10,
+            data.pacmanLeftCol*10+15,data.pacmanTopRow*10+15,fill="black")
+        if data.pacmanDirection == "Up":
+            canvas.create_polygon(data.pacmanLeftCol*10, data.pacmanTopRow*10,
+            data.pacmanRightCol*10-15,data.pacmanBottomRow*10-15,
+            data.pacmanRightCol*10,data.pacmanTopRow*10,fill="black")
+        if data.pacmanDirection == "Down":
+            canvas.create_polygon(data.pacmanLeftCol*10, data.pacmanBottomRow*10,
+            data.pacmanLeftCol*10+15,data.pacmanBottomRow*10-15,
+            data.pacmanRightCol*10,data.pacmanBottomRow*10,fill="black")
         #draws ghosts
         for ghost in data.ghosts:
             canvas.create_oval(ghost[0]*10,ghost[1]*10,ghost[0]*10+30,
             ghost[1]*10+30,fill=ghost[2])
+            canvas.create_oval(ghost[0]*10+8,ghost[1]*10+8,ghost[0]*10+11,
+            ghost[1]*10+10,fill="black")
+            canvas.create_oval(ghost[0]*10+18,ghost[1]*10+8,ghost[0]*10+21,
+            ghost[1]*10+10,fill="black")
+            canvas.create_oval(ghost[0]*10+10,ghost[1]*10+18,ghost[0]*10+20,
+            ghost[1]*10+20,fill="black")
     if data.loseState:
         scoreText = "Score: %d" % (data.score)
         canvas.create_text(data.width//2,data.height//3+35,text="YOU LOST",
@@ -792,7 +808,6 @@ def getBestDirection(data,ghost):
             data.ghosts[ghost-1][1] -= 2
             if distance < bestDistance:
                 if direction == "Left":
-                    #print("prior was left")
                     data.ghosts[num-1][0] -= 2
                 if direction == "Right":
                     data.ghosts[num-1][0] += 2
@@ -802,10 +817,8 @@ def getBestDirection(data,ghost):
     
 def ghostsCollide(data,num):
     if num == 1:
-        print(data.ghosts[1][0])
         if data.ghosts[1][0] <= data.ghosts[0][0] <= data.ghosts[1][0]+3 \
         and data.ghosts[1][1] <= data.ghosts[0][1] <= data.ghosts[1][1]+3:
-            print("run into one ghost")
             return True
         if data.ghosts[2][0] <= data.ghosts[0][0] <= data.ghosts[2][0]+3 \
         and data.ghosts[2][1] <= data.ghosts[0][1] <= data.ghosts[2][1]+3:
@@ -855,8 +868,8 @@ def run(width=300, height=300):
     data = Struct()
     data.width = width
     data.height = height
-    data.timerDelay = 500 # milliseconds
-    root = Tk()
+    data.timerDelay = 100 # milliseconds
+    root = Toplevel()
     init(data)
     # create the root and the canvas
     canvas = Canvas(root, width=data.width, height=data.height)
