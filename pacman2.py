@@ -9,9 +9,10 @@ from tkinter import *
 def init(data):
     data.startState = False
     data.instructionState = False
-    data.gameState = True
+    data.gameState = False
+    data.game2State = False
     data.loseState = False
-    data.winState = False
+    data.winState = True
     data.timer = 200
     data.margin = 10
     data.cellColors = drawBoard(data)
@@ -60,7 +61,7 @@ def mousePressed(event, data):
             if 450 <= y <= 500:
                 data.instructionState = False
                 data.gameState = True
-    if data.gameState:
+    if data.gameState and data.game2State:
         print(x,y)
 
 def keyPressed(event, data):
@@ -68,7 +69,7 @@ def keyPressed(event, data):
         if event.keysym == "b":
             data.startState = False
             data.instructionState = True
-    if data.gameState:
+    if data.gameState or data.game2State:
         #changes the direction of pac man based on the key the user presses
         if event.keysym == "Right":
             data.pacmanDirection = "Right"
@@ -127,8 +128,12 @@ def keyPressed(event, data):
                         data.ghosts[count][2] = "red"
                     count += 1
     if data.loseState or data.winState:
-        if event.keysym == "p":
-            init(data)
+        if event.keysym == "1":
+            data.winState = False
+            data.gameState = True
+        if event.keysym == "2":
+            data.winState = False
+            data.game2State = True            
     
 def timerFired(data):
     if data.startState:
@@ -141,15 +146,17 @@ def timerFired(data):
         data.startGhost[2] += 5
         if data.startCircle[0] <= data.startGhost[2]:
             data.startLost = True
-    if data.gameState:
+    if data.gameState or data.game2State:
         if data.count%4 == 0:
             data.timer -= 1
         if data.timer == 0:
             data.gameState = False
+            data.game2State = False
             data.winState = True
         data.count += 1
         if len(data.coins) == 0:
             data.gameState = False
+            data.game2State = False
             data.winState = True
         #moves ghost one
         if data.count == 5:
@@ -245,7 +252,7 @@ def redrawAll(canvas, data):
         canvas.create_rectangle(220,450,380,500,fill="white")
         canvas.create_text(data.width//2,475,text="Continue",font="Arial 28 bold",
         fill="black")
-    if data.gameState:
+    if data.gameState or data.game2State:
         #draws board
         for x in range(0,data.height,10):
             for y in range(0,data.width,10):
@@ -313,7 +320,9 @@ def redrawAll(canvas, data):
         canvas.create_text(data.width//2,data.height//3+85,
         text=scoreText,font="Arial 30",fill="yellow")
         canvas.create_text(data.width//2,data.height//3+135,
-        text="Press 'p' to play again",font="Arial 22",fill="plum")
+        text="Press '1' to play level 1",font="Arial 22",fill="plum")
+        canvas.create_text(data.width//2,data.height//3+165,
+        text="Press '2' to play level 2",font="Arial 22",fill="plum")
             
 def moveStartCircles(data):
     #on start screen, move circles across the screen
@@ -733,6 +742,7 @@ def checkCollisions(data):
                 data.lives -= 1
                 if data.lives == 0:
                     data.gameState = False
+                    data.game2State = False
                     data.loseState = True
     if data.switchRoles:
         count = -1
@@ -758,6 +768,7 @@ def checkCollisions(data):
                         data.lives -= 1
                         if data.lives == 0:
                             data.gameState = False
+                            data.game2State = False
                             data.loseState = True
             if count == 1:
                 row = 27
@@ -779,6 +790,7 @@ def checkCollisions(data):
                         data.lives -= 1
                         if data.lives == 0:
                             data.gameState = False
+                            data.game2State = False
                             data.loseState = True
             if count == 2:
                 row = 31
@@ -800,6 +812,7 @@ def checkCollisions(data):
                         data.lives -= 1
                         if data.lives == 0:
                             data.gameState = False
+                            data.gmae2State = False
                             data.loseState = True
                     
 def getBestDirection(data,ghost):
