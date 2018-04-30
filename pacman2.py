@@ -3,6 +3,7 @@
 
 import random
 import math
+import socket
 from tkinter import *
 
 def init(data):
@@ -11,6 +12,7 @@ def init(data):
     data.gameState = True
     data.loseState = False
     data.winState = False
+    data.timer = 200
     data.margin = 10
     data.cellColors = drawBoard(data)
     data.cellCount = 0
@@ -28,6 +30,7 @@ def init(data):
     data.coins = drawCoins(data)
     data.count = 0
     data.score = 0
+    data.lives = 3
     data.numRows = data.height//20
     data.numCols = data.width//20
     data.pacmanTopRow = 41
@@ -48,7 +51,6 @@ def init(data):
     data.redCount = 0
     data.coinsSpecial = []
     data.normalGhosts = []
-    data.picture = PhotoImage(file="pacman1.gif")
     
 def mousePressed(event, data):
     x = event.x
@@ -140,6 +142,11 @@ def timerFired(data):
         if data.startCircle[0] <= data.startGhost[2]:
             data.startLost = True
     if data.gameState:
+        if data.count%4 == 0:
+            data.timer -= 1
+        if data.timer == 0:
+            data.gameState = False
+            data.winState = True
         data.count += 1
         if len(data.coins) == 0:
             data.gameState = False
@@ -151,6 +158,12 @@ def timerFired(data):
         if (data.count >= 5):
             if validGhostMove(data,1):
                 moveGhost(data,1)
+            if not(validGhostMove(data,1)):
+                if data.count%5 == 0:
+                    index = random.randint(0,len(data.directions)-1)
+                    data.ghost1Direction = data.directions[index]
+                if validGhostMove(data,1):
+                    moveGhost(data,1)
         #moves ghost two
         if data.count == 15:
             data.ghosts[1][1] = 26
@@ -158,6 +171,12 @@ def timerFired(data):
         if (data.count >= 15):
             if validGhostMove(data,2):
                 moveGhost(data,2)
+            if not(validGhostMove(data,2)):
+                if data.count%5 == 0:
+                    index = random.randint(0,len(data.directions)-1)
+                    data.ghost2Direction = data.directions[index]
+                if validGhostMove(data,2):
+                    moveGhost(data,2)
         #moves ghost three
         if data.count == 30:
             data.ghosts[2][1] = 26
@@ -165,6 +184,12 @@ def timerFired(data):
         if (data.count >= 30):
             if validGhostMove(data,3):
                 moveGhost(data,3)
+            if not(validGhostMove(data,3)):
+                if data.count%5 == 0:
+                    index = random.randint(0,len(data.directions)-1)
+                    data.ghost3Direction = data.directions[index]
+                if validGhostMove(data,3):
+                    moveGhost(data,3)
         if data.switchRoles:
             data.redCount += 1
             for ghost in data.ghosts:
@@ -238,6 +263,12 @@ def redrawAll(canvas, data):
         #draws the score
         scoreText = "Score: %d" % (data.score)
         canvas.create_text(63,28,text=scoreText,fill="white",font="Arial 20")
+        #draws the lives remaining
+        livesText = "Lives: %s" % (data.lives)
+        canvas.create_text(300,28,text=livesText,fill="white",font="Arial 20")
+        #draws the time remaining
+        timerText = "Time left: %d" % (data.timer)
+        canvas.create_text(530,28,text=timerText,fill="white",font="Arial 20")
         #draws pac man
         canvas.create_oval(data.pacmanLeftCol*10,data.pacmanTopRow*10,
         data.pacmanRightCol*10,data.pacmanBottomRow*10,fill="yellow")
@@ -507,8 +538,13 @@ def validGhostMove(data,num):
     #avoids the ghost from running into any walls
     if direction == "Right":
         data.ghosts[num-1][0] += 1
-        if ghostsCollide(data,num) != False:
-            if 31 <= data.ghosts[num-1][1] <= 34 and data.ghosts[num-1][0]+3 > 59:
+        print(ghostsCollide(data,num))
+        if ghostsCollide(data,num):
+            data.ghosts[num-1][0] -= 1
+            return False
+        if ghostsCollide(data,num) == None:
+            if 31 <= data.ghosts[num-1][1] <= 34 and \
+            data.ghosts[num-1][0]+3 > 59:
                 data.ghosts[num-1][0] = 0
             else:
                 #if the cell to the right is black, is valid to move
@@ -521,12 +557,12 @@ def validGhostMove(data,num):
                 else:
                     data.ghosts[num-1][0] -= 1
                     return False
-        if ghostsCollide(data,num):
-            data.ghosts[num-1][0] -= 3
-            return False
     elif direction == "Left":
         data.ghosts[num-1][0] -= 1
-        if ghostsCollide(data,num) != False:
+        if ghostsCollide(data,num):
+            data.ghosts[num-1][0] += 3
+            return False
+        if ghostsCollide(data,num) == None:
             if 31 <= data.ghosts[num-1][1] <= 34 and data.ghosts[num-1][0] < 0:
                 data.ghosts[num-1][0] = 56
             else:
@@ -540,12 +576,12 @@ def validGhostMove(data,num):
                 else:
                     data.ghosts[num-1][0] += 1
                     return False
-        if ghostsCollide(data,num):
-            data.ghosts[num-1][0] += 3
-            return False
     elif direction == "Up":
         data.ghosts[num-1][1] -= 1
-        if ghostsCollide(data,num) != False:
+        if ghostsCollide(data,num):
+            data.ghosts[num-1][1] += 3
+            return False
+        if ghostsCollide(data,num) == None:
             #if the cell above is black, is valid to move
             row = data.ghosts[num-1][1]-1
             col = data.ghosts[num-1][0]-1
@@ -556,12 +592,12 @@ def validGhostMove(data,num):
             else:
                 data.ghosts[num-1][1] += 1
                 return False
-        if ghostsCollide(data,num):
-            data.ghosts[num-1][1] += 3
-            return False
     elif direction == "Down":
         data.ghosts[num-1][1] += 1
-        if ghostsCollide(data,num) != False:
+        if ghostsCollide(data,num):
+            data.ghosts[num-1][1] -= 3
+            return False
+        if ghostsCollide(data,num) == None:
             #if the cell below is black, is valid to move
             row = data.ghosts[num-1][1]+2
             col = data.ghosts[num-1][0]-1
@@ -572,9 +608,6 @@ def validGhostMove(data,num):
             else:
                 data.ghosts[num-1][1] -= 1
                 return False
-        if ghostsCollide(data,num):
-            data.ghosts[num-1][1] -= 3
-            return False
     else:
         return True
                 
@@ -688,13 +721,19 @@ def getCoins(data):
     
 def checkCollisions(data):
     if data.switchRoles == False:
+        count = -1
         for ghost in data.ghosts:
+            count += 1
             if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
             ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
             (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
             ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
-                data.gameState = False
-                data.loseState = True
+                data.lives -= 1
+                if data.lives == 0:
+                    data.ghosts[count][0] = 27
+                    data.ghosts[count][1] = 33
+                    data.gameState = False
+                    data.loseState = True
     if data.switchRoles:
         count = -1
         for ghost in data.ghosts:
@@ -714,8 +753,12 @@ def checkCollisions(data):
                         data.ghosts[count][0] = row
                         data.ghosts[count][1] = col
                     else:
-                        data.gameState = False
-                        data.loseState = True
+                        data.lives -= 1
+                        data.ghosts[count][0] = 27
+                        data.ghosts[count][1] = 33
+                        if data.lives == 0:
+                            data.gameState = False
+                            data.loseState = True
             if count == 1:
                 row = 27
                 col = 33
@@ -731,8 +774,12 @@ def checkCollisions(data):
                         data.ghosts[count][0] = row
                         data.ghosts[count][1] = col
                     else:
-                        data.gameState = False
-                        data.loseState = True
+                        data.lives -= 1
+                        data.ghosts[count][0] = 27
+                        data.ghosts[count][1] = 33
+                        if data.lives == 0:
+                            data.gameState = False
+                            data.loseState = True
             if count == 2:
                 row = 31
                 col = 33
@@ -748,8 +795,12 @@ def checkCollisions(data):
                         data.ghosts[count][0] = row
                         data.ghosts[count][1] = col
                     else:
-                        data.gameState = False
-                        data.loseState = True
+                        data.lives -= 1
+                        data.ghosts[count][0] = 27
+                        data.ghosts[count][1] = 33
+                        if data.lives == 0:
+                            data.gameState = False
+                            data.loseState = True
                     
 def getBestDirection(data,ghost):
     bestDistance = 10000
@@ -887,7 +938,7 @@ def run(width=300, height=300):
 run(600, 600)
 
 #################################################
-# Colab6 Main
+# Term Project Main
 ################################################
 
 def testAll():
