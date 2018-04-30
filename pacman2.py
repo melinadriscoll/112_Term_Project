@@ -728,10 +728,10 @@ def checkCollisions(data):
             ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
             (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
             ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
+                data.ghosts[count][0] = 27
+                data.ghosts[count][1] = 33
                 data.lives -= 1
                 if data.lives == 0:
-                    data.ghosts[count][0] = 27
-                    data.ghosts[count][1] = 33
                     data.gameState = False
                     data.loseState = True
     if data.switchRoles:
@@ -753,9 +753,9 @@ def checkCollisions(data):
                         data.ghosts[count][0] = row
                         data.ghosts[count][1] = col
                     else:
+                        data.ghosts[count][0] = row
+                        data.ghosts[count][1] = col
                         data.lives -= 1
-                        data.ghosts[count][0] = 27
-                        data.ghosts[count][1] = 33
                         if data.lives == 0:
                             data.gameState = False
                             data.loseState = True
@@ -774,9 +774,9 @@ def checkCollisions(data):
                         data.ghosts[count][0] = row
                         data.ghosts[count][1] = col
                     else:
+                        data.ghosts[count][0] = row
+                        data.ghosts[count][1] = col
                         data.lives -= 1
-                        data.ghosts[count][0] = 27
-                        data.ghosts[count][1] = 33
                         if data.lives == 0:
                             data.gameState = False
                             data.loseState = True
@@ -795,9 +795,9 @@ def checkCollisions(data):
                         data.ghosts[count][0] = row
                         data.ghosts[count][1] = col
                     else:
+                        data.ghosts[count][0] = row
+                        data.ghosts[count][1] = col
                         data.lives -= 1
-                        data.ghosts[count][0] = 27
-                        data.ghosts[count][1] = 33
                         if data.lives == 0:
                             data.gameState = False
                             data.loseState = True
