@@ -10,9 +10,9 @@ def init(data):
     data.startState = False
     data.instructionState = False
     data.gameState = False
-    data.game2State = False
+    data.game2State = True
     data.loseState = False
-    data.winState = True
+    data.winState = False
     data.timer = 200
     data.margin = 10
     data.cellColors = drawBoard(data)
@@ -44,10 +44,15 @@ def init(data):
     data.pacmanCenterX+15,data.pacmanCenterY+15]
     data.pacmanDirection = None
     data.ghosts = [[29,30,"tomato"],[27,33,"deepskyblue"],[31,33,"magenta"]]
+    data.ghosts2 = [[27,29,"tomato"],[27,32,"deepskyblue"],[27,35,"magenta"],
+    [31,29,"peru"],[31,32,"plum"],[31,35,"palegreen"]]
     data.directions = ["Right", "Left", "Up", "Down"]
     data.ghost1Direction = None
     data.ghost2Direction = None
     data.ghost3Direction = None
+    data.ghost4Direction = None
+    data.ghost5Direction = None
+    data.ghost6Direction = None
     data.switchRoles = False
     data.redCount = 0
     data.coinsSpecial = []
@@ -81,10 +86,16 @@ def keyPressed(event, data):
                 data.score += 5
                 data.switchRoles = True
                 count = 0
-                for ghost in data.ghosts:
-                    if not(ghost in data.normalGhosts):
-                        data.ghosts[count][2] = "red"
-                    count += 1
+                if data.gameState:
+                    for ghost in data.ghosts:
+                        if not(ghost in data.normalGhosts):
+                            data.ghosts[count][2] = "red"
+                        count += 1
+                if data.game2State:
+                    for ghost in data.ghosts2:
+                        if not(ghost in data.normalGhosts):
+                            data.ghosts2[count][2] = "red"
+                        count += 1
         if event.keysym == "Left":
             data.pacmanDirection = "Left"
             if validToMove(data):
@@ -95,10 +106,16 @@ def keyPressed(event, data):
                 data.score += 5
                 data.switchRoles = True
                 count = 0
-                for ghost in data.ghosts:
-                    if not(ghost in data.normalGhosts):
-                        data.ghosts[count][2] = "red"
-                    count += 1
+                if data.gameState:
+                    for ghost in data.ghosts:
+                        if not(ghost in data.normalGhosts):
+                            data.ghosts[count][2] = "red"
+                        count += 1
+                if data.game2State:
+                    for ghost in data.ghosts2:
+                        if not(ghost in data.normalGhosts):
+                            data.ghosts2[count][2] = "red"
+                        count += 1
         if event.keysym == "Up":
             data.pacmanDirection = "Up"
             if validToMove(data):
@@ -109,10 +126,16 @@ def keyPressed(event, data):
                 data.score += 5
                 data.switchRoles = True
                 count = 0
-                for ghost in data.ghosts:
-                    if not(ghost in data.normalGhosts):
-                        data.ghosts[count][2] = "red"
-                    count += 1
+                if data.gameState:
+                    for ghost in data.ghosts:
+                        if not(ghost in data.normalGhosts):
+                            data.ghosts[count][2] = "red"
+                        count += 1
+                if data.game2State:
+                    for ghost in data.ghosts2:
+                        if not(ghost in data.normalGhosts):
+                            data.ghosts2[count][2] = "red"
+                        count += 1
         if event.keysym == "Down":
             data.pacmanDirection = "Down"
             if validToMove(data):
@@ -123,10 +146,16 @@ def keyPressed(event, data):
                 data.score += 5
                 data.switchRoles = True
                 count = 0
-                for ghost in data.ghosts:
-                    if not(ghost in data.normalGhosts):
-                        data.ghosts[count][2] = "red"
-                    count += 1
+                if data.gameState:
+                    for ghost in data.ghosts:
+                        if not(ghost in data.normalGhosts):
+                            data.ghosts[count][2] = "red"
+                        count += 1
+                if data.game2State:
+                    for ghost in data.ghosts2:
+                        if not(ghost in data.normalGhosts):
+                            data.ghosts2[count][2] = "red"
+                        count += 1
     if data.loseState or data.winState:
         if event.keysym == "1":
             data.winState = False
@@ -149,54 +178,141 @@ def timerFired(data):
     if data.gameState or data.game2State:
         if data.count%4 == 0:
             data.timer -= 1
-        if data.timer == 0:
-            data.gameState = False
-            data.game2State = False
-            data.winState = True
-        data.count += 1
+        if data.gameState:
+            data.count += 1
+            if data.timer == 0:
+                data.gameState = False
+                data.game2State = False
+                data.winState = True
+        if data.game2State:
+            data.count += 1
+            if data.timer == 100:
+                data.gameState = False
+                data.game2State = False
+                data.winState = True
         if len(data.coins) == 0:
             data.gameState = False
             data.game2State = False
             data.winState = True
-        #moves ghost one
-        if data.count == 5:
-            data.ghosts[0][1] = 26
-        data.ghost1Direction = getBestDirection(data,1)
-        if (data.count >= 5):
-            if validGhostMove(data,1):
-                moveGhost(data,1)
-            if not(validGhostMove(data,1)):
-                if data.count%5 == 0:
-                    index = random.randint(0,len(data.directions)-1)
-                    data.ghost1Direction = data.directions[index]
+        if data.gameState:
+            #moves ghost one
+            if data.count == 5:
+                data.ghosts[0][1] = 26
+            data.ghost1Direction = getBestDirection(data,1)
+            if (data.count >= 5):
                 if validGhostMove(data,1):
                     moveGhost(data,1)
-        #moves ghost two
-        if data.count == 15:
-            data.ghosts[1][1] = 26
-        data.ghost2Direction = getBestDirection(data,2)
-        if (data.count >= 15):
-            if validGhostMove(data,2):
-                moveGhost(data,2)
-            if not(validGhostMove(data,2)):
-                if data.count%5 == 0:
-                    index = random.randint(0,len(data.directions)-1)
-                    data.ghost2Direction = data.directions[index]
+                if not(validGhostMove(data,1)):
+                    if data.count%5 == 0:
+                        index = random.randint(0,len(data.directions)-1)
+                        data.ghost1Direction = data.directions[index]
+                    if validGhostMove(data,1):
+                        moveGhost(data,1)
+            #moves ghost two
+            if data.count == 15:
+                data.ghosts[1][1] = 26
+            data.ghost2Direction = getBestDirection(data,2)
+            if (data.count >= 15):
                 if validGhostMove(data,2):
                     moveGhost(data,2)
-        #moves ghost three
-        if data.count == 30:
-            data.ghosts[2][1] = 26
-        data.ghost3Direction = getBestDirection(data,3)
-        if (data.count >= 30):
-            if validGhostMove(data,3):
-                moveGhost(data,3)
-            if not(validGhostMove(data,3)):
-                if data.count%5 == 0:
-                    index = random.randint(0,len(data.directions)-1)
-                    data.ghost3Direction = data.directions[index]
+                if not(validGhostMove(data,2)):
+                    if data.count%5 == 0:
+                        index = random.randint(0,len(data.directions)-1)
+                        data.ghost2Direction = data.directions[index]
+                    if validGhostMove(data,2):
+                        moveGhost(data,2)
+            #moves ghost three
+            if data.count == 30:
+                data.ghosts[2][1] = 26
+            data.ghost3Direction = getBestDirection(data,3)
+            if (data.count >= 30):
                 if validGhostMove(data,3):
                     moveGhost(data,3)
+                if not(validGhostMove(data,3)):
+                    if data.count%5 == 0:
+                        index = random.randint(0,len(data.directions)-1)
+                        data.ghost3Direction = data.directions[index]
+                    if validGhostMove(data,3):
+                        moveGhost(data,3)
+        if data.game2State:
+            #moves ghost one
+            if data.count == 5:
+                data.ghosts2[0][1] = 26
+            data.ghost1Direction = getBestDirection(data,1)
+            if (data.count >= 5):
+                if validGhostMove(data,1):
+                    moveGhost(data,1)
+                if not(validGhostMove(data,1)):
+                    if data.count%5 == 0:
+                        index = random.randint(0,len(data.directions)-1)
+                        data.ghost1Direction = data.directions[index]
+                    if validGhostMove(data,1):
+                        moveGhost(data,1)
+            #moves ghost two
+            if data.count == 15:
+                data.ghosts2[1][1] = 26
+            data.ghost2Direction = getBestDirection(data,2)
+            if (data.count >= 15):
+                if validGhostMove(data,2):
+                    moveGhost(data,2)
+                if not(validGhostMove(data,2)):
+                    if data.count%5 == 0:
+                        index = random.randint(0,len(data.directions)-1)
+                        data.ghost2Direction = data.directions[index]
+                    if validGhostMove(data,2):
+                        moveGhost(data,2)
+            #moves ghost three
+            if data.count == 30:
+                data.ghosts2[2][1] = 26
+            data.ghost3Direction = getBestDirection(data,3)
+            if (data.count >= 30):
+                if validGhostMove(data,3):
+                    moveGhost(data,3)
+                if not(validGhostMove(data,3)):
+                    if data.count%5 == 0:
+                        index = random.randint(0,len(data.directions)-1)
+                        data.ghost3Direction = data.directions[index]
+                    if validGhostMove(data,3):
+                        moveGhost(data,3)
+            #moves ghost four
+            if data.count == 35:
+                data.ghosts2[3][1] = 26
+            data.ghost4Direction = getBestDirection(data,4)
+            if (data.count >= 35):
+                if validGhostMove(data,4):
+                    moveGhost(data,4)
+                if not(validGhostMove(data,4)):
+                    if data.count%5 == 0:
+                        index = random.randint(0,len(data.directions)-1)
+                        data.ghost4Direction = data.directions[index]
+                    if validGhostMove(data,4):
+                        moveGhost(data,4)
+            #moves ghost five
+            if data.count == 45:
+                data.ghosts2[4][1] = 26
+            data.ghost5Direction = getBestDirection(data,5)
+            if (data.count >= 45):
+                if validGhostMove(data,5):
+                    moveGhost(data,5)
+                if not(validGhostMove(data,5)):
+                    if data.count%5 == 0:
+                        index = random.randint(0,len(data.directions)-1)
+                        data.ghost5Direction = data.directions[index]
+                    if validGhostMove(data,5):
+                        moveGhost(data,5)
+            #moves ghost six
+            if data.count == 50:
+                data.ghosts2[5][1] = 26
+            data.ghost6Direction = getBestDirection(data,6)
+            if (data.count >= 50):
+                if validGhostMove(data,6):
+                    moveGhost(data,6)
+                if not(validGhostMove(data,6)):
+                    if data.count%5 == 0:
+                        index = random.randint(0,len(data.directions)-1)
+                        data.ghost6Direction = data.directions[index]
+                    if validGhostMove(data,6):
+                        moveGhost(data,6)
         if data.switchRoles:
             data.redCount += 1
             for ghost in data.ghosts:
@@ -273,9 +389,16 @@ def redrawAll(canvas, data):
         #draws the lives remaining
         livesText = "Lives: %s" % (data.lives)
         canvas.create_text(300,28,text=livesText,fill="white",font="Arial 20")
-        #draws the time remaining
-        timerText = "Time left: %d" % (data.timer)
-        canvas.create_text(530,28,text=timerText,fill="white",font="Arial 20")
+        if data.gameState:
+            #draws the time remaining
+            timerText = "Time left: %d" % (data.timer)
+            canvas.create_text(530,28,text=timerText,fill="white",
+            font="Arial 20")
+        if data.game2State:
+            #draws the time remaining
+            timerText = "Time left: %d" % (data.timer-100)
+            canvas.create_text(530,28,text=timerText,fill="white",
+            font="Arial 20")
         #draws pac man
         canvas.create_oval(data.pacmanLeftCol*10,data.pacmanTopRow*10,
         data.pacmanRightCol*10,data.pacmanBottomRow*10,fill="yellow")
@@ -296,15 +419,26 @@ def redrawAll(canvas, data):
             data.pacmanLeftCol*10+15,data.pacmanBottomRow*10-15,
             data.pacmanRightCol*10,data.pacmanBottomRow*10,fill="black")
         #draws ghosts
-        for ghost in data.ghosts:
-            canvas.create_oval(ghost[0]*10,ghost[1]*10,ghost[0]*10+30,
-            ghost[1]*10+30,fill=ghost[2])
-            canvas.create_oval(ghost[0]*10+8,ghost[1]*10+8,ghost[0]*10+11,
-            ghost[1]*10+10,fill="black")
-            canvas.create_oval(ghost[0]*10+18,ghost[1]*10+8,ghost[0]*10+21,
-            ghost[1]*10+10,fill="black")
-            canvas.create_oval(ghost[0]*10+10,ghost[1]*10+18,ghost[0]*10+20,
-            ghost[1]*10+20,fill="black")
+        if data.gameState:
+            for ghost in data.ghosts:
+                canvas.create_oval(ghost[0]*10,ghost[1]*10,ghost[0]*10+30,
+                ghost[1]*10+30,fill=ghost[2])
+                canvas.create_oval(ghost[0]*10+8,ghost[1]*10+8,ghost[0]*10+11,
+                ghost[1]*10+10,fill="black")
+                canvas.create_oval(ghost[0]*10+18,ghost[1]*10+8,ghost[0]*10+21,
+                ghost[1]*10+10,fill="black")
+                canvas.create_oval(ghost[0]*10+10,ghost[1]*10+18,ghost[0]*10+20,
+                ghost[1]*10+20,fill="black")
+        if data.game2State:
+            for ghost in data.ghosts2:
+                canvas.create_oval(ghost[0]*10,ghost[1]*10,ghost[0]*10+30,
+                ghost[1]*10+30,fill=ghost[2])
+                canvas.create_oval(ghost[0]*10+8,ghost[1]*10+8,ghost[0]*10+11,
+                ghost[1]*10+10,fill="black")
+                canvas.create_oval(ghost[0]*10+18,ghost[1]*10+8,ghost[0]*10+21,
+                ghost[1]*10+10,fill="black")
+                canvas.create_oval(ghost[0]*10+10,ghost[1]*10+18,ghost[0]*10+20,
+                ghost[1]*10+20,fill="black")
     if data.loseState:
         scoreText = "Score: %d" % (data.score)
         canvas.create_text(data.width//2,data.height//3+35,text="YOU LOST",
@@ -540,85 +674,166 @@ def validGhostMove(data,num):
         direction = data.ghost2Direction
     if num == 3:
         direction = data.ghost3Direction
+    if num == 4:
+        direction = data.ghost4Direction
+    if num == 5:
+        direction = data.ghost5Direction
+    if num == 6:
+        direction = data.ghost6Direction
     #rightCol = data.ghosts[num-1][0]+3
     #leftCol = data.ghosts[num-1][0]
     #topRow = data.ghosts[num-1][1]
     #bottomRow = data.ghosts[num-1][1]+3
     #avoids the ghost from running into any walls
-    if direction == "Right":
-        data.ghosts[num-1][0] += 1
-        print(ghostsCollide(data,num))
-        if ghostsCollide(data,num):
-            data.ghosts[num-1][0] -= 1
-            return False
-        if ghostsCollide(data,num) == None:
-            if 31 <= data.ghosts[num-1][1] <= 34 and \
-            data.ghosts[num-1][0]+3 > 59:
-                data.ghosts[num-1][0] = 0
-            else:
-                #if the cell to the right is black, is valid to move
-                row = data.ghosts[num-1][1]-1
-                col = data.ghosts[num-1][0]+2
-                row2 = data.ghosts[num-1][1]+2
-                if data.cellColors[row][col]=="black" and \
-                data.cellColors[row2][col] == "black":
-                    return True
+    if data.gameState:
+        if direction == "Right":
+            data.ghosts[num-1][0] += 1
+            if ghostsCollide(data,num):
+                data.ghosts[num-1][0] -= 1
+                return False
+            if ghostsCollide(data,num) == None:
+                if 31 <= data.ghosts[num-1][1] <= 34 and \
+                data.ghosts[num-1][0]+3 > 59:
+                    data.ghosts[num-1][0] = 0
                 else:
-                    data.ghosts[num-1][0] -= 1
-                    return False
-    elif direction == "Left":
-        data.ghosts[num-1][0] -= 1
-        if ghostsCollide(data,num):
-            data.ghosts[num-1][0] += 3
-            return False
-        if ghostsCollide(data,num) == None:
-            if 31 <= data.ghosts[num-1][1] <= 34 and data.ghosts[num-1][0] < 0:
-                data.ghosts[num-1][0] = 56
-            else:
-                #if the cell to the left is black, is valid to move
+                    #if the cell to the right is black, is valid to move
+                    row = data.ghosts[num-1][1]-1
+                    col = data.ghosts[num-1][0]+2
+                    row2 = data.ghosts[num-1][1]+2
+                    if data.cellColors[row][col]=="black" and \
+                    data.cellColors[row2][col] == "black":
+                        return True
+                    else:
+                        data.ghosts[num-1][0] -= 1
+                        return False
+        elif direction == "Left":
+            data.ghosts[num-1][0] -= 1
+            if ghostsCollide(data,num):
+                data.ghosts[num-1][0] += 3
+                return False
+            if ghostsCollide(data,num) == None:
+                if 31 <= data.ghosts[num-1][1] <= 34 and data.ghosts[num-1][0] < 0:
+                    data.ghosts[num-1][0] = 56
+                else:
+                    #if the cell to the left is black, is valid to move
+                    row = data.ghosts[num-1][1]-1
+                    col = data.ghosts[num-1][0]-1
+                    row2 = data.ghosts[num-1][1]+2
+                    if data.cellColors[row][col]=="black" and \
+                    data.cellColors[row2][col]=="black":
+                        return True
+                    else:
+                        data.ghosts[num-1][0] += 1
+                        return False
+        elif direction == "Up":
+            data.ghosts[num-1][1] -= 1
+            if ghostsCollide(data,num):
+                data.ghosts[num-1][1] += 3
+                return False
+            if ghostsCollide(data,num) == None:
+                #if the cell above is black, is valid to move
                 row = data.ghosts[num-1][1]-1
                 col = data.ghosts[num-1][0]-1
-                row2 = data.ghosts[num-1][1]+2
+                col2 = data.ghosts[num-1][0]+2
                 if data.cellColors[row][col]=="black" and \
-                data.cellColors[row2][col]=="black":
+                data.cellColors[row][col2]=="black":
                     return True
                 else:
-                    data.ghosts[num-1][0] += 1
+                    data.ghosts[num-1][1] += 1
                     return False
-    elif direction == "Up":
-        data.ghosts[num-1][1] -= 1
-        if ghostsCollide(data,num):
-            data.ghosts[num-1][1] += 3
-            return False
-        if ghostsCollide(data,num) == None:
-            #if the cell above is black, is valid to move
-            row = data.ghosts[num-1][1]-1
-            col = data.ghosts[num-1][0]-1
-            col2 = data.ghosts[num-1][0]+2
-            if data.cellColors[row][col]=="black" and \
-            data.cellColors[row][col2]=="black":
-                return True
-            else:
-                data.ghosts[num-1][1] += 1
+        elif direction == "Down":
+            data.ghosts[num-1][1] += 1
+            if ghostsCollide(data,num):
+                data.ghosts[num-1][1] -= 3
                 return False
-    elif direction == "Down":
-        data.ghosts[num-1][1] += 1
-        if ghostsCollide(data,num):
-            data.ghosts[num-1][1] -= 3
-            return False
-        if ghostsCollide(data,num) == None:
-            #if the cell below is black, is valid to move
-            row = data.ghosts[num-1][1]+2
-            col = data.ghosts[num-1][0]-1
-            col2 = data.ghosts[num-1][0]+2
-            if data.cellColors[row][col]=="black" and \
-            data.cellColors[row][col2] == "black":
-                return True
-            else:
-                data.ghosts[num-1][1] -= 1
+            if ghostsCollide(data,num) == None:
+                #if the cell below is black, is valid to move
+                row = data.ghosts[num-1][1]+2
+                col = data.ghosts[num-1][0]-1
+                col2 = data.ghosts[num-1][0]+2
+                if data.cellColors[row][col]=="black" and \
+                data.cellColors[row][col2] == "black":
+                    return True
+                else:
+                    data.ghosts[num-1][1] -= 1
+                    return False
+        else:
+            return True
+    if data.game2State:
+        if direction == "Right":
+            data.ghosts2[num-1][0] += 1
+            if ghostsCollide(data,num):
+                data.ghosts2[num-1][0] -= 1
                 return False
-    else:
-        return True
+            if ghostsCollide(data,num) == None:
+                if 31 <= data.ghosts2[num-1][1] <= 34 and \
+                data.ghosts2[num-1][0]+3 > 59:
+                    data.ghosts2[num-1][0] = 0
+                else:
+                    #if the cell to the right is black, is valid to move
+                    row = data.ghosts2[num-1][1]-1
+                    col = data.ghosts2[num-1][0]+2
+                    row2 = data.ghosts2[num-1][1]+2
+                    if data.cellColors[row][col]=="black" and \
+                    data.cellColors[row2][col] == "black":
+                        return True
+                    else:
+                        data.ghosts2[num-1][0] -= 1
+                        return False
+        elif direction == "Left":
+            data.ghosts2[num-1][0] -= 1
+            if ghostsCollide(data,num):
+                data.ghosts2[num-1][0] += 3
+                return False
+            if ghostsCollide(data,num) == None:
+                if 31 <= data.ghosts2[num-1][1] <= 34 and \
+                data.ghosts2[num-1][0] < 0:
+                    data.ghosts2[num-1][0] = 56
+                else:
+                    #if the cell to the left is black, is valid to move
+                    row = data.ghosts2[num-1][1]-1
+                    col = data.ghosts2[num-1][0]-1
+                    row2 = data.ghosts2[num-1][1]+2
+                    if data.cellColors[row][col]=="black" and \
+                    data.cellColors[row2][col]=="black":
+                        return True
+                    else:
+                        data.ghosts2[num-1][0] += 1
+                        return False
+        elif direction == "Up":
+            data.ghosts2[num-1][1] -= 1
+            if ghostsCollide(data,num):
+                data.ghosts2[num-1][1] += 3
+                return False
+            if ghostsCollide(data,num) == None:
+                #if the cell above is black, is valid to move
+                row = data.ghosts2[num-1][1]-1
+                col = data.ghosts2[num-1][0]-1
+                col2 = data.ghosts2[num-1][0]+2
+                if data.cellColors[row][col]=="black" and \
+                data.cellColors[row][col2]=="black":
+                    return True
+                else:
+                    data.ghosts2[num-1][1] += 1
+                    return False
+        elif direction == "Down":
+            data.ghosts2[num-1][1] += 1
+            if ghostsCollide(data,num):
+                data.ghosts2[num-1][1] -= 3
+                return False
+            if ghostsCollide(data,num) == None:
+                #if the cell below is black, is valid to move
+                row = data.ghosts2[num-1][1]+2
+                col = data.ghosts2[num-1][0]-1
+                col2 = data.ghosts2[num-1][0]+2
+                if data.cellColors[row][col]=="black" and \
+                data.cellColors[row][col2] == "black":
+                    return True
+                else:
+                    data.ghosts2[num-1][1] -= 1
+                    return False
+        else:
+            return True
                 
 def movePacman(data):
     if data.pacmanDirection == "Right":
@@ -641,29 +856,60 @@ def movePacman(data):
         data.pacmanBottomRow += 1
         
 def moveGhost(data,num):
-    if data.count%50 == 0:
-        if num == 1:
-            direction = data.ghost1Direction
-        if num == 2:
-            direction = data.ghost2Direction
-        if num == 3:
-            direction = data.ghost3Direction
-        #rightCol = data.ghosts[num-1][0]+3
-        #leftCol = data.ghosts[num-1][0]
-        #topRow = data.ghosts[num-1][1]
-        #bottomRow = data.ghosts[num-1][1]+3
-        if direction == "Right":
-            data.ghosts[num-1][0] += 1
-            if data.ghosts[num-1][1] == 32 and data.ghosts[num-1][0]+3 > 59:
-                data.ghosts[num-1][0] = 0
-        if direction == "Left":
-            data.ghosts[num-1][0] -= 1
-            if data.ghosts[num-1][1] == 32 and data.ghosts[num-1][0] < 0:
-                data.ghosts[num-1][0] = 56
-        if direction == "Up":
-            data.ghosts[num-1][1] -= 1
-        if direction == "Down":
-            data.ghosts[num-1][1] += 1
+    if data.gameState:
+        if data.count%50 == 0:
+            if num == 1:
+                direction = data.ghost1Direction
+            if num == 2:
+                direction = data.ghost2Direction
+            if num == 3:
+                direction = data.ghost3Direction
+            #rightCol = data.ghosts[num-1][0]+3
+            #leftCol = data.ghosts[num-1][0]
+            #topRow = data.ghosts[num-1][1]
+            #bottomRow = data.ghosts[num-1][1]+3
+            if direction == "Right":
+                data.ghosts[num-1][0] += 1
+                if data.ghosts[num-1][1] == 32 and data.ghosts[num-1][0]+3 > 59:
+                    data.ghosts[num-1][0] = 0
+            if direction == "Left":
+                data.ghosts[num-1][0] -= 1
+                if data.ghosts[num-1][1] == 32 and data.ghosts[num-1][0] < 0:
+                    data.ghosts[num-1][0] = 56
+            if direction == "Up":
+                data.ghosts[num-1][1] -= 1
+            if direction == "Down":
+                data.ghosts[num-1][1] += 1
+    if data.game2State:
+        if data.count%50 == 0:
+            if num == 1:
+                direction = data.ghost1Direction
+            if num == 2:
+                direction = data.ghost2Direction
+            if num == 3:
+                direction = data.ghost3Direction
+            if num == 4:
+                direction = data.ghost4Direction
+            if num == 5:
+                direction = data.ghost5Direction
+            if num == 6:
+                direction = data.ghost6Direction
+            #rightCol = data.ghosts[num-1][0]+3
+            #leftCol = data.ghosts[num-1][0]
+            #topRow = data.ghosts[num-1][1]
+            #bottomRow = data.ghosts[num-1][1]+3
+            if direction == "Right":
+                data.ghosts2[num-1][0] += 1
+                if data.ghosts2[num-1][1] == 32 and data.ghosts2[num-1][0]+3 > 59:
+                    data.ghosts2[num-1][0] = 0
+            if direction == "Left":
+                data.ghosts2[num-1][0] -= 1
+                if data.ghosts2[num-1][1] == 32 and data.ghosts2[num-1][0] < 0:
+                    data.ghosts2[num-1][0] = 56
+            if direction == "Up":
+                data.ghosts2[num-1][1] -= 1
+            if direction == "Down":
+                data.ghosts2[num-1][1] += 1
         
 def drawCoins(data):
     results = []
@@ -729,178 +975,486 @@ def getCoins(data):
                     return "regular"
     
 def checkCollisions(data):
-    if data.switchRoles == False:
-        count = -1
-        for ghost in data.ghosts:
-            count += 1
-            if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
-            ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
-            (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
-            ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
-                data.ghosts[count][0] = 27
-                data.ghosts[count][1] = 33
-                data.lives -= 1
-                if data.lives == 0:
-                    data.gameState = False
-                    data.game2State = False
-                    data.loseState = True
-    if data.switchRoles:
-        count = -1
-        for ghost in data.ghosts:
-            count += 1
-            if count == 0:
-                row = 29
-                col = 30
-                color = "tomato"
+    if data.gameState:
+        if data.switchRoles == False:
+            count = -1
+            for ghost in data.ghosts:
+                count += 1
                 if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
                 ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
                 (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
                 ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
-                    if not(ghost in data.normalGhosts):
-                        data.score += 10
-                        data.normalGhosts.append(ghost)
-                        data.ghosts[count][2] = color
-                        data.ghosts[count][0] = row
-                        data.ghosts[count][1] = col
-                    else:
-                        data.ghosts[count][0] = row
-                        data.ghosts[count][1] = col
-                        data.lives -= 1
-                        if data.lives == 0:
-                            data.gameState = False
-                            data.game2State = False
-                            data.loseState = True
-            if count == 1:
-                row = 27
-                col = 33
-                color = "deepskyblue"
+                    data.ghosts[count][0] = 27
+                    data.ghosts[count][1] = 33
+                    data.lives -= 1
+                    if data.lives == 0:
+                        data.gameState = False
+                        data.loseState = True
+        if data.switchRoles:
+            count = -1
+            for ghost in data.ghosts:
+                count += 1
+                if count == 0:
+                    row = 29
+                    col = 30
+                    color = "tomato"
+                    if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
+                    ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
+                    (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
+                    ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
+                        if not(ghost in data.normalGhosts):
+                            data.score += 10
+                            data.normalGhosts.append(ghost)
+                            data.ghosts[count][2] = color
+                            data.ghosts[count][0] = row
+                            data.ghosts[count][1] = col
+                        else:
+                            data.ghosts[count][0] = row
+                            data.ghosts[count][1] = col
+                            data.lives -= 1
+                            if data.lives == 0:
+                                data.gameState = False
+                                data.loseState = True
+                if count == 1:
+                    row = 27
+                    col = 33
+                    color = "deepskyblue"
+                    if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
+                    ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
+                    (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
+                    ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
+                        if not(ghost in data.normalGhosts):
+                            data.score += 10
+                            data.normalGhosts.append(ghost)
+                            data.ghosts[count][2] = color
+                            data.ghosts[count][0] = row
+                            data.ghosts[count][1] = col
+                        else:
+                            data.ghosts[count][0] = row
+                            data.ghosts[count][1] = col
+                            data.lives -= 1
+                            if data.lives == 0:
+                                data.gameState = False
+                                data.loseState = True
+                if count == 2:
+                    row = 31
+                    col = 33
+                    color = "magenta"
+                    if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
+                    ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
+                    (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
+                    ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
+                        if not(ghost in data.normalGhosts):
+                            data.score += 10
+                            data.normalGhosts.append(ghost)
+                            data.ghosts[count][2] = color
+                            data.ghosts[count][0] = row
+                            data.ghosts[count][1] = col
+                        else:
+                            data.ghosts[count][0] = row
+                            data.ghosts[count][1] = col
+                            data.lives -= 1
+                            if data.lives == 0:
+                                data.gameState = False
+                                data.loseState = True
+    if data.game2State:
+        if data.switchRoles == False:
+            count = -1
+            for ghost in data.ghosts2:
+                count += 1
                 if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
                 ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
                 (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
                 ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
-                    if not(ghost in data.normalGhosts):
-                        data.score += 10
-                        data.normalGhosts.append(ghost)
-                        data.ghosts[count][2] = color
-                        data.ghosts[count][0] = row
-                        data.ghosts[count][1] = col
-                    else:
-                        data.ghosts[count][0] = row
-                        data.ghosts[count][1] = col
-                        data.lives -= 1
-                        if data.lives == 0:
-                            data.gameState = False
-                            data.game2State = False
-                            data.loseState = True
-            if count == 2:
-                row = 31
-                col = 33
-                color = "magenta"
-                if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
-                ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
-                (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
-                ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
-                    if not(ghost in data.normalGhosts):
-                        data.score += 10
-                        data.normalGhosts.append(ghost)
-                        data.ghosts[count][2] = color
-                        data.ghosts[count][0] = row
-                        data.ghosts[count][1] = col
-                    else:
-                        data.ghosts[count][0] = row
-                        data.ghosts[count][1] = col
-                        data.lives -= 1
-                        if data.lives == 0:
-                            data.gameState = False
-                            data.gmae2State = False
-                            data.loseState = True
+                    data.ghosts2[count][0] = 27
+                    data.ghosts2[count][1] = 33
+                    data.lives -= 1
+                    if data.lives == 0:
+                        data.game2State = False
+                        data.loseState = True
+        if data.switchRoles:
+            count = -1
+            for ghost in data.ghosts2:
+                count += 1
+                if count == 0:
+                    row = 29
+                    col = 30
+                    color = "tomato"
+                    if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
+                    ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
+                    (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
+                    ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
+                        if not(ghost in data.normalGhosts):
+                            data.score += 10
+                            data.normalGhosts.append(ghost)
+                            data.ghosts2[count][2] = color
+                            data.ghosts2[count][0] = row
+                            data.ghosts2[count][1] = col
+                        else:
+                            data.ghosts2[count][0] = row
+                            data.ghosts2[count][1] = col
+                            data.lives -= 1
+                            if data.lives == 0:
+                                data.game2State = False
+                                data.loseState = True
+                if count == 1:
+                    row = 27
+                    col = 33
+                    color = "deepskyblue"
+                    if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
+                    ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
+                    (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
+                    ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
+                        if not(ghost in data.normalGhosts):
+                            data.score += 10
+                            data.normalGhosts.append(ghost)
+                            data.ghosts2[count][2] = color
+                            data.ghosts2[count][0] = row
+                            data.ghosts2[count][1] = col
+                        else:
+                            data.ghosts2[count][0] = row
+                            data.ghosts2[count][1] = col
+                            data.lives -= 1
+                            if data.lives == 0:
+                                data.game2State = False
+                                data.loseState = True
+                if count == 2:
+                    row = 31
+                    col = 33
+                    color = "magenta"
+                    if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
+                    ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
+                    (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
+                    ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
+                        if not(ghost in data.normalGhosts):
+                            data.score += 10
+                            data.normalGhosts.append(ghost)
+                            data.ghosts2[count][2] = color
+                            data.ghosts2[count][0] = row
+                            data.ghosts2[count][1] = col
+                        else:
+                            data.ghosts2[count][0] = row
+                            data.ghosts2[count][1] = col
+                            data.lives -= 1
+                            if data.lives == 0:
+                                data.gmae2State = False
+                                data.loseState = True
+                if count == 3:
+                    row = 29
+                    col = 30
+                    color = "peru"
+                    if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
+                    ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
+                    (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
+                    ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
+                        if not(ghost in data.normalGhosts):
+                            data.score += 10
+                            data.normalGhosts.append(ghost)
+                            data.ghosts2[count][2] = color
+                            data.ghosts2[count][0] = row
+                            data.ghosts2[count][1] = col
+                        else:
+                            data.ghosts2[count][0] = row
+                            data.ghosts2[count][1] = col
+                            data.lives -= 1
+                            if data.lives == 0:
+                                data.game2State = False
+                                data.loseState = True
+                if count == 4:
+                    row = 27
+                    col = 33
+                    color = "plum"
+                    if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
+                    ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
+                    (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
+                    ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
+                        if not(ghost in data.normalGhosts):
+                            data.score += 10
+                            data.normalGhosts.append(ghost)
+                            data.ghosts2[count][2] = color
+                            data.ghosts2[count][0] = row
+                            data.ghosts2[count][1] = col
+                        else:
+                            data.ghosts2[count][0] = row
+                            data.ghosts2[count][1] = col
+                            data.lives -= 1
+                            if data.lives == 0:
+                                data.game2State = False
+                                data.loseState = True
+                if count == 5:
+                    row = 31
+                    col = 33
+                    color = "palegreen"
+                    if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
+                    ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
+                    (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
+                    ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
+                        if not(ghost in data.normalGhosts):
+                            data.score += 10
+                            data.normalGhosts.append(ghost)
+                            data.ghosts2[count][2] = color
+                            data.ghosts2[count][0] = row
+                            data.ghosts2[count][1] = col
+                        else:
+                            data.ghosts2[count][0] = row
+                            data.ghosts2[count][1] = col
+                            data.lives -= 1
+                            if data.lives == 0:
+                                data.gmae2State = False
+                                data.loseState = True
                     
 def getBestDirection(data,ghost):
     bestDistance = 10000
     bestDirection = None
-    if ghost == 1:
-        direction = data.ghost1Direction
-    if ghost == 2:
-        direction = data.ghost2Direction
-    if ghost == 3:
-        direction = data.ghost3Direction
-    for direction in data.directions:
-        if direction == "Left":
-            data.ghosts[ghost-1][0] -= 2
-            distanceCols = math.fabs(data.pacmanLeftCol - \
-            data.ghosts[ghost-1][0])
-            distanceRows = math.fabs(data.pacmanTopRow - \
-            data.ghosts[ghost-1][1])
-            distance = distanceCols + distanceRows
-            data.ghosts[ghost-1][0] += 2
-            if distance < bestDistance:
-                bestDistance = distance
-                bestDirection = "Left"
-        if direction == "Right":
-            data.ghosts[ghost-1][0] += 2
-            distanceCols = math.fabs(data.pacmanLeftCol - \
-            data.ghosts[ghost-1][0])
-            distanceRows = math.fabs(data.pacmanTopRow - \
-            data.ghosts[ghost-1][1])
-            distance = distanceCols + distanceRows
-            data.ghosts[ghost-1][0] -= 2
-            if distance < bestDistance:
-                bestDistance = distance
-                bestDirection = "Right"
-        if direction == "Up":
-            data.ghosts[ghost-1][1] -= 2
-            distanceCols = math.fabs(data.pacmanLeftCol - \
-            data.ghosts[ghost-1][0])
-            distanceRows = math.fabs(data.pacmanTopRow - \
-            data.ghosts[ghost-1][1])
-            distance = distanceCols + distanceRows
-            data.ghosts[ghost-1][1] += 2
-            if distance < bestDistance:
-                if direction == "Left":
-                    data.ghosts[num-1][0] -= 2
-                if direction == "Right":
-                    data.ghosts[num-1][0] += 2
-                bestDistance = distance
-                bestDirection = "Up"
-        if direction == "Down":
-            data.ghosts[ghost-1][1] += 2
-            distanceCols = math.fabs(data.pacmanLeftCol - \
-            data.ghosts[ghost-1][0])
-            distanceRows = math.fabs(data.pacmanTopRow - \
-            data.ghosts[ghost-1][1])
-            distance = distanceCols + distanceRows
-            data.ghosts[ghost-1][1] -= 2
-            if distance < bestDistance:
-                if direction == "Left":
-                    data.ghosts[num-1][0] -= 2
-                if direction == "Right":
-                    data.ghosts[num-1][0] += 2
-                bestDistance = distance
-                bestDirection = "Down"
-    return bestDirection
+    if data.gameState:
+        if ghost == 1:
+            direction = data.ghost1Direction
+        if ghost == 2:
+            direction = data.ghost2Direction
+        if ghost == 3:
+            direction = data.ghost3Direction
+        for direction in data.directions:
+            if direction == "Left":
+                data.ghosts[ghost-1][0] -= 2
+                distanceCols = math.fabs(data.pacmanLeftCol - \
+                data.ghosts[ghost-1][0])
+                distanceRows = math.fabs(data.pacmanTopRow - \
+                data.ghosts[ghost-1][1])
+                distance = distanceCols + distanceRows
+                data.ghosts[ghost-1][0] += 2
+                if distance < bestDistance:
+                    bestDistance = distance
+                    bestDirection = "Left"
+            if direction == "Right":
+                data.ghosts[ghost-1][0] += 2
+                distanceCols = math.fabs(data.pacmanLeftCol - \
+                data.ghosts[ghost-1][0])
+                distanceRows = math.fabs(data.pacmanTopRow - \
+                data.ghosts[ghost-1][1])
+                distance = distanceCols + distanceRows
+                data.ghosts[ghost-1][0] -= 2
+                if distance < bestDistance:
+                    bestDistance = distance
+                    bestDirection = "Right"
+            if direction == "Up":
+                data.ghosts[ghost-1][1] -= 2
+                distanceCols = math.fabs(data.pacmanLeftCol - \
+                data.ghosts[ghost-1][0])
+                distanceRows = math.fabs(data.pacmanTopRow - \
+                data.ghosts[ghost-1][1])
+                distance = distanceCols + distanceRows
+                data.ghosts[ghost-1][1] += 2
+                if distance < bestDistance:
+                    if direction == "Left":
+                        data.ghosts[num-1][0] -= 2
+                    if direction == "Right":
+                        data.ghosts[num-1][0] += 2
+                    bestDistance = distance
+                    bestDirection = "Up"
+            if direction == "Down":
+                data.ghosts[ghost-1][1] += 2
+                distanceCols = math.fabs(data.pacmanLeftCol - \
+                data.ghosts[ghost-1][0])
+                distanceRows = math.fabs(data.pacmanTopRow - \
+                data.ghosts[ghost-1][1])
+                distance = distanceCols + distanceRows
+                data.ghosts[ghost-1][1] -= 2
+                if distance < bestDistance:
+                    if direction == "Left":
+                        data.ghosts[num-1][0] -= 2
+                    if direction == "Right":
+                        data.ghosts[num-1][0] += 2
+                    bestDistance = distance
+                    bestDirection = "Down"
+        return bestDirection
+    if data.game2State:
+        if ghost == 1:
+            direction = data.ghost1Direction
+        if ghost == 2:
+            direction = data.ghost2Direction
+        if ghost == 3:
+            direction = data.ghost3Direction
+        if ghost == 4:
+            direction = data.ghost4Direction
+        if ghost == 5:
+            direction = data.ghost5Direction
+        if ghost == 6:
+            direction = data.ghost6Direction
+        for direction in data.directions:
+            if direction == "Left":
+                data.ghosts2[ghost-1][0] -= 2
+                distanceCols = math.fabs(data.pacmanLeftCol - \
+                data.ghosts2[ghost-1][0])
+                distanceRows = math.fabs(data.pacmanTopRow - \
+                data.ghosts2[ghost-1][1])
+                distance = distanceCols + distanceRows
+                data.ghosts2[ghost-1][0] += 2
+                if distance < bestDistance:
+                    bestDistance = distance
+                    bestDirection = "Left"
+            if direction == "Right":
+                data.ghosts2[ghost-1][0] += 2
+                distanceCols = math.fabs(data.pacmanLeftCol - \
+                data.ghosts2[ghost-1][0])
+                distanceRows = math.fabs(data.pacmanTopRow - \
+                data.ghosts2[ghost-1][1])
+                distance = distanceCols + distanceRows
+                data.ghosts2[ghost-1][0] -= 2
+                if distance < bestDistance:
+                    bestDistance = distance
+                    bestDirection = "Right"
+            if direction == "Up":
+                data.ghosts2[ghost-1][1] -= 2
+                distanceCols = math.fabs(data.pacmanLeftCol - \
+                data.ghosts2[ghost-1][0])
+                distanceRows = math.fabs(data.pacmanTopRow - \
+                data.ghosts2[ghost-1][1])
+                distance = distanceCols + distanceRows
+                data.ghosts2[ghost-1][1] += 2
+                if distance < bestDistance:
+                    if direction == "Left":
+                        data.ghosts2[num-1][0] -= 2
+                    if direction == "Right":
+                        data.ghosts2[num-1][0] += 2
+                    bestDistance = distance
+                    bestDirection = "Up"
+            if direction == "Down":
+                data.ghosts2[ghost-1][1] += 2
+                distanceCols = math.fabs(data.pacmanLeftCol - \
+                data.ghosts2[ghost-1][0])
+                distanceRows = math.fabs(data.pacmanTopRow - \
+                data.ghosts2[ghost-1][1])
+                distance = distanceCols + distanceRows
+                data.ghosts2[ghost-1][1] -= 2
+                if distance < bestDistance:
+                    if direction == "Left":
+                        data.ghosts2[num-1][0] -= 2
+                    if direction == "Right":
+                        data.ghosts2[num-1][0] += 2
+                    bestDistance = distance
+                    bestDirection = "Down"
+        return bestDirection
     
 def ghostsCollide(data,num):
-    if num == 1:
-        if data.ghosts[1][0] <= data.ghosts[0][0] <= data.ghosts[1][0]+3 \
-        and data.ghosts[1][1] <= data.ghosts[0][1] <= data.ghosts[1][1]+3:
-            return True
-        if data.ghosts[2][0] <= data.ghosts[0][0] <= data.ghosts[2][0]+3 \
-        and data.ghosts[2][1] <= data.ghosts[0][1] <= data.ghosts[2][1]+3:
-            return True
-    if num == 2:
-        if data.ghosts[0][0] <= data.ghosts[1][0] <= data.ghosts[0][0]+3 \
-        and data.ghosts[0][1] <= data.ghosts[1][1] <= data.ghosts[0][1]+3:
-            return True
-        if data.ghosts[2][0] <= data.ghosts[1][0] <= data.ghosts[2][0]+3 \
-        and data.ghosts[2][1] <= data.ghosts[1][1] <= data.ghosts[2][1]+3:
-            return True
-    if num == 3:
-        if data.ghosts[0][0] <= data.ghosts[2][0] <= data.ghosts[0][0]+3 \
-        and data.ghosts[0][1] <= data.ghosts[2][1] <= data.ghosts[0][1]+3:
-            return True
-        if data.ghosts[1][0] <= data.ghosts[2][0] <= data.ghosts[1][0]+3 \
-        and data.ghosts[1][1] <= data.ghosts[2][1] <= data.ghosts[1][1]+3:
-            return True
+    if data.gameState:
+        if num == 1:
+            if data.ghosts[1][0] <= data.ghosts[0][0] <= data.ghosts[1][0]+3 \
+            and data.ghosts[1][1] <= data.ghosts[0][1] <= data.ghosts[1][1]+3:
+                return True
+            if data.ghosts[2][0] <= data.ghosts[0][0] <= data.ghosts[2][0]+3 \
+            and data.ghosts[2][1] <= data.ghosts[0][1] <= data.ghosts[2][1]+3:
+                return True
+        if num == 2:
+            if data.ghosts[0][0] <= data.ghosts[1][0] <= data.ghosts[0][0]+3 \
+            and data.ghosts[0][1] <= data.ghosts[1][1] <= data.ghosts[0][1]+3:
+                return True
+            if data.ghosts[2][0] <= data.ghosts[1][0] <= data.ghosts[2][0]+3 \
+            and data.ghosts[2][1] <= data.ghosts[1][1] <= data.ghosts[2][1]+3:
+                return True
+        if num == 3:
+            if data.ghosts[0][0] <= data.ghosts[2][0] <= data.ghosts[0][0]+3 \
+            and data.ghosts[0][1] <= data.ghosts[2][1] <= data.ghosts[0][1]+3:
+                return True
+            if data.ghosts[1][0] <= data.ghosts[2][0] <= data.ghosts[1][0]+3 \
+            and data.ghosts[1][1] <= data.ghosts[2][1] <= data.ghosts[1][1]+3:
+                return True
+    if data.game2State:
+        if num == 1:
+            if data.ghosts2[1][0] <= data.ghosts2[0][0] <= data.ghosts2[1][0]+3 \
+            and data.ghosts2[1][1] <= data.ghosts2[0][1] <= data.ghosts2[1][1]+3:
+                return True
+            if data.ghosts2[2][0] <= data.ghosts2[0][0] <= data.ghosts2[2][0]+3 \
+            and data.ghosts2[2][1] <= data.ghosts2[0][1] <= data.ghosts2[2][1]+3:
+                return True
+            if data.ghosts2[3][0] <= data.ghosts2[0][0] <= data.ghosts2[3][0]+3 \
+            and data.ghosts2[3][1] <= data.ghosts2[0][1] <= data.ghosts2[3][1]+3:
+                return True
+            if data.ghosts2[4][0] <= data.ghosts2[0][0] <= data.ghosts2[4][0]+3 \
+            and data.ghosts2[4][1] <= data.ghosts2[0][1] <= data.ghosts2[4][1]+3:
+                return True
+            if data.ghosts2[5][0] <= data.ghosts2[0][0] <= data.ghosts2[5][0]+3 \
+            and data.ghosts2[5][1] <= data.ghosts2[0][1] <= data.ghosts2[5][1]+3:
+                return True
+        if num == 2:
+            if data.ghosts2[0][0] <= data.ghosts2[1][0] <= data.ghosts2[0][0]+3 \
+            and data.ghosts2[0][1] <= data.ghosts2[1][1] <= data.ghosts2[0][1]+3:
+                return True
+            if data.ghosts2[2][0] <= data.ghosts2[1][0] <= data.ghosts2[2][0]+3 \
+            and data.ghosts2[2][1] <= data.ghosts2[1][1] <= data.ghosts2[2][1]+3:
+                return True
+            if data.ghosts2[3][0] <= data.ghosts2[1][0] <= data.ghosts2[3][0]+3 \
+            and data.ghosts2[3][1] <= data.ghosts2[1][1] <= data.ghosts2[3][1]+3:
+                return True
+            if data.ghosts2[4][0] <= data.ghosts2[1][0] <= data.ghosts2[4][0]+3 \
+            and data.ghosts2[4][1] <= data.ghosts2[1][1] <= data.ghosts2[4][1]+3:
+                return True
+            if data.ghosts2[5][0] <= data.ghosts2[1][0] <= data.ghosts2[5][0]+3 \
+            and data.ghosts2[5][1] <= data.ghosts2[1][1] <= data.ghosts2[5][1]+3:
+                return True
+        if num == 3:
+            if data.ghosts2[1][0] <= data.ghosts2[2][0] <= data.ghosts2[1][0]+3 \
+            and data.ghosts2[1][1] <= data.ghosts2[2][1] <= data.ghosts2[1][1]+3:
+                return True
+            if data.ghosts2[0][0] <= data.ghosts2[2][0] <= data.ghosts2[0][0]+3 \
+            and data.ghosts2[0][1] <= data.ghosts2[2][1] <= data.ghosts2[0][1]+3:
+                return True
+            if data.ghosts2[3][0] <= data.ghosts2[2][0] <= data.ghosts2[3][0]+3 \
+            and data.ghosts2[3][1] <= data.ghosts2[2][1] <= data.ghosts2[3][1]+3:
+                return True
+            if data.ghosts2[4][0] <= data.ghosts2[2][0] <= data.ghosts2[4][0]+3 \
+            and data.ghosts2[4][1] <= data.ghosts2[2][1] <= data.ghosts2[4][1]+3:
+                return True
+            if data.ghosts2[5][0] <= data.ghosts2[2][0] <= data.ghosts2[5][0]+3 \
+            and data.ghosts2[5][1] <= data.ghosts2[2][1] <= data.ghosts2[5][1]+3:
+                return True
+        if num == 4:
+            if data.ghosts2[1][0] <= data.ghosts2[3][0] <= data.ghosts2[1][0]+3 \
+            and data.ghosts2[1][1] <= data.ghosts2[3][1] <= data.ghosts2[1][1]+3:
+                return True
+            if data.ghosts2[2][0] <= data.ghosts2[3][0] <= data.ghosts2[2][0]+3 \
+            and data.ghosts2[2][1] <= data.ghosts2[3][1] <= data.ghosts2[2][1]+3:
+                return True
+            if data.ghosts2[0][0] <= data.ghosts2[3][0] <= data.ghosts2[0][0]+3 \
+            and data.ghosts2[0][1] <= data.ghosts2[3][1] <= data.ghosts2[0][1]+3:
+                return True
+            if data.ghosts2[4][0] <= data.ghosts2[3][0] <= data.ghosts2[4][0]+3 \
+            and data.ghosts2[4][1] <= data.ghosts2[3][1] <= data.ghosts2[4][1]+3:
+                return True
+            if data.ghosts2[5][0] <= data.ghosts2[3][0] <= data.ghosts2[5][0]+3 \
+            and data.ghosts2[5][1] <= data.ghosts2[3][1] <= data.ghosts2[5][1]+3:
+                return True
+        if num == 5:
+            if data.ghosts2[1][0] <= data.ghosts2[4][0] <= data.ghosts2[1][0]+3 \
+            and data.ghosts2[1][1] <= data.ghosts2[4][1] <= data.ghosts2[1][1]+3:
+                return True
+            if data.ghosts2[2][0] <= data.ghosts2[4][0] <= data.ghosts2[2][0]+3 \
+            and data.ghosts2[2][1] <= data.ghosts2[4][1] <= data.ghosts2[2][1]+3:
+                return True
+            if data.ghosts2[3][0] <= data.ghosts2[4][0] <= data.ghosts2[3][0]+3 \
+            and data.ghosts2[3][1] <= data.ghosts2[4][1] <= data.ghosts2[3][1]+3:
+                return True
+            if data.ghosts2[0][0] <= data.ghosts2[4][0] <= data.ghosts2[0][0]+3 \
+            and data.ghosts2[0][1] <= data.ghosts2[4][1] <= data.ghosts2[0][1]+3:
+                return True
+            if data.ghosts2[5][0] <= data.ghosts2[4][0] <= data.ghosts2[5][0]+3 \
+            and data.ghosts2[5][1] <= data.ghosts2[4][1] <= data.ghosts2[5][1]+3:
+                return True
+        if num == 6:
+            if data.ghosts2[1][0] <= data.ghosts2[5][0] <= data.ghosts2[1][0]+3 \
+            and data.ghosts2[1][1] <= data.ghosts2[5][1] <= data.ghosts2[1][1]+3:
+                return True
+            if data.ghosts2[2][0] <= data.ghosts2[5][0] <= data.ghosts2[2][0]+3 \
+            and data.ghosts2[2][1] <= data.ghosts2[5][1] <= data.ghosts2[2][1]+3:
+                return True
+            if data.ghosts2[3][0] <= data.ghosts2[5][0] <= data.ghosts2[3][0]+3 \
+            and data.ghosts2[3][1] <= data.ghosts2[5][1] <= data.ghosts2[3][1]+3:
+                return True
+            if data.ghosts2[4][0] <= data.ghosts2[5][0] <= data.ghosts2[4][0]+3 \
+            and data.ghosts2[4][1] <= data.ghosts2[5][1] <= data.ghosts2[4][1]+3:
+                return True
+            if data.ghosts2[0][0] <= data.ghosts2[5][0] <= data.ghosts2[0][0]+3 \
+            and data.ghosts2[0][1] <= data.ghosts2[5][1] <= data.ghosts2[0][1]+3:
+                return True
             
 ####################################
 # use the run function as-is
