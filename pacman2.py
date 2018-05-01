@@ -7,10 +7,10 @@ import socket
 from tkinter import *
 
 def init(data):
-    data.startState = True
+    data.startState = False
     data.instructionState = False
     data.gameState = False
-    data.game2State = False
+    data.game2State = True
     data.loseState = False
     data.winState = False
     data.timer = 200
@@ -24,8 +24,8 @@ def init(data):
     data.direction2 = -5
     data.startCircle = [data.width//2-30,data.height//2-30,data.width//2+30,
     data.height//2+30]
-    data.startGhost = [data.startCircle[0]-80,data.startCircle[1],
-    data.startCircle[2]-80,data.startCircle[3]]
+    data.startGhost = [data.startCircle[0]-70,data.startCircle[1],
+    data.startCircle[2]-70,data.startCircle[3]]
     data.startLost = False
     data.timerDelay = 100
     data.coins = drawCoins(data)
@@ -44,8 +44,8 @@ def init(data):
     data.pacmanCenterX+15,data.pacmanCenterY+15]
     data.pacmanDirection = None
     data.ghosts = [[29,30,"tomato"],[27,33,"deepskyblue"],[31,33,"magenta"]]
-    data.ghosts2 = [[27,29,"tomato"],[27,32,"deepskyblue"],[27,35,"magenta"],
-    [31,29,"peru"],[31,32,"plum"],[31,35,"palegreen"]]
+    data.ghosts2 = [[25,31,"tomato"],[29,31,"deepskyblue"],[33,31,"magenta"],
+    [25,35,"peru"],[29,35,"plum"],[33,35,"palegreen"]]
     data.directions = ["Right", "Left", "Up", "Down"]
     data.ghostRowReset = None
     data.ghostColReset = None
@@ -502,101 +502,198 @@ def drawBoard(data):
     [],[],[],[],[],[],[],[],[],[],[],[],[],[],[],
     [],[],[],[],[],[],[],[],[],[],[],[],[],[],[],
     [],[],[],[],[],[],[],[],[],[],[],[],[],[],[]]
-    for x in range(0,data.height,10):
-        for y in range(0,60):
-            #top
-            if (10 <= x <= 570 and 10 <= y*10 <= 20):
-                result[y].append("blue")
-            #top left box
-            elif (80 <= x <= 140 and 80 <= y*10 <= 140):
-                result[y].append("blue")
-            #top middle left box
-            elif (200 <= x <= 230 and 80 <= y*10 <= 220):
-                result[y].append("blue")
-            #top middle middle box
-            elif (290 <= x <= 290 and 80 <= y*10 <= 220):
-                result[y].append("blue")
-            #top middle right box
-            elif (350 <= x <= 380 and 80 <= y*10 <= 220):
-                result[y].append("blue")
-            #top middle box
-            elif (140 <= x <= 440 and 200 <= y*10 <= 230):
-                result[y].append("blue")
-            #top right box
-            elif (440 <= x <= 500 and 80 <= y*10 <= 140):
-                result[y].append("blue")
-            #ghost home
-            elif (260 <= x <= 330 and 290 <= y*10 <= 350):
-                result[y].append("cornflowerblue")
-            #topmiddle left box
-            elif (140 <= x <= 200 and 290 <= y*10 <= 350):
-                result[y].append("blue")
-            #topmiddle right box
-            elif (380 <= x <= 450 and 290 <= y*10 <= 350):
-                result[y].append("blue")
-            #middle left box
-            elif (170 <= x <= 260 and 440 <= y*10 <= 470):
-                result[y].append("blue")
-            #middle right box
-            elif (320 <= x <= 410 and 440 <= y*10 <= 470):
-                result[y].append("blue")
-            #bottom left box
-            elif (80 <= x <= 140 and 470 <= y*10 <= 500):
-                result[y].append("blue")
-            #small bottom left box
-            elif (140 <= x <= 200 and 500 <= y*10 <= 500):
-                result[y].append("blue")
-            #bottom right box
-            elif (440 <= x <= 500 and 470 <= y*10 <= 500):
-                result[y].append("blue")
-            #small bottom right box
-            elif (380 <= x <= 440 and 500 <= y*10 <= 500):
-                result[y].append("blue")
-            #bottom middle box
-            elif (260 <= x <= 320 and 500 <= y*10 <= 500):
-                result[y].append("blue")
-            #top right outline
-            elif (560 <= x <= 570 and 20 <= y*10 <= 200):
-                result[y].append("blue")
-            elif (500 <= x <= 570 and 200 <= y*10 <= 210):
-                result[y].append("blue")
-            elif (500 <= x <= 510 and 200 <= y*10 <= 290):
-                result[y].append("blue")
-            elif (500 <= x <= 600 and 280 <= y*10 <= 290):
-                result[y].append("blue")
-            #bottom right outline
-            elif (500 <= x <= 600 and 350 <= y*10 <= 360):
-                result[y].append("blue")
-            elif (500 <= x <= 510 and 350 <= y*10 <= 410):
-                result[y].append("blue")
-            elif (500 <= x <= 560 and 400 <= y*10 <= 410):
-                result[y].append("blue")
-            elif (560 <= x <= 570 and 400 <= y*10 <= 570):
-                result[y].append("blue")
-            #bottom
-            elif (10 <= x <= 560 and 560 <= y*10 <= 570):
-                result[y].append("blue")
-            #bottom left outline
-            elif (10 <= x <= 20 and 400 <= y*10 <= 570):
-                result[y].append("blue")
-            elif (10 <= x <= 80 and 400 <= y*10 <= 410):
-                result[y].append("blue")
-            elif (70 <= x <= 80 and 350 <= y*10 <= 410):
-                result[y].append("blue")
-            elif (0 <= x <= 80 and 350 <= y*10 <= 360):
-                result[y].append("blue")
-            #top left outline
-            elif (0 <= x <= 80 and 280 <= y*10 <= 290):
-                result[y].append("blue")
-            elif (70 <= x <= 80 and 200 <= y*10 <= 290):
-                result[y].append("blue")
-            elif (10 <= x <= 80 and 200 <= y*10 <= 210):
-                result[y].append("blue")
-            elif (10 <= x <= 20 and 20 <= y*10 <= 210):
-                result[y].append("blue")
-            else:
-                result[y].append("black")
-    return result
+    if data.gameState:
+        for x in range(0,data.height,10):
+            for y in range(0,60):
+                #top
+                if (10 <= x <= 570 and 10 <= y*10 <= 20):
+                    result[y].append("blue")
+                #top left box
+                elif (80 <= x <= 140 and 80 <= y*10 <= 140):
+                    result[y].append("blue")
+                #top middle left box
+                elif (200 <= x <= 230 and 80 <= y*10 <= 220):
+                    result[y].append("blue")
+                #top middle middle box
+                elif (290 <= x <= 290 and 80 <= y*10 <= 220):
+                    result[y].append("blue")
+                #top middle right box
+                elif (350 <= x <= 380 and 80 <= y*10 <= 220):
+                    result[y].append("blue")
+                #top middle box
+                elif (140 <= x <= 440 and 200 <= y*10 <= 230):
+                    result[y].append("blue")
+                #top right box
+                elif (440 <= x <= 500 and 80 <= y*10 <= 140):
+                    result[y].append("blue")
+                #ghost home
+                elif (260 <= x <= 330 and 290 <= y*10 <= 350):
+                    result[y].append("cornflowerblue")
+                #topmiddle left box
+                elif (140 <= x <= 200 and 290 <= y*10 <= 350):
+                    result[y].append("blue")
+                #topmiddle right box
+                elif (380 <= x <= 450 and 290 <= y*10 <= 350):
+                    result[y].append("blue")
+                #middle left box
+                elif (170 <= x <= 260 and 440 <= y*10 <= 470):
+                    result[y].append("blue")
+                #middle right box
+                elif (320 <= x <= 410 and 440 <= y*10 <= 470):
+                    result[y].append("blue")
+                #bottom left box
+                elif (80 <= x <= 140 and 470 <= y*10 <= 500):
+                    result[y].append("blue")
+                #small bottom left box
+                elif (140 <= x <= 200 and 500 <= y*10 <= 500):
+                    result[y].append("blue")
+                #bottom right box
+                elif (440 <= x <= 500 and 470 <= y*10 <= 500):
+                    result[y].append("blue")
+                #small bottom right box
+                elif (380 <= x <= 440 and 500 <= y*10 <= 500):
+                    result[y].append("blue")
+                #bottom middle box
+                elif (260 <= x <= 320 and 500 <= y*10 <= 500):
+                    result[y].append("blue")
+                #top right outline
+                elif (560 <= x <= 570 and 20 <= y*10 <= 200):
+                    result[y].append("blue")
+                elif (500 <= x <= 570 and 200 <= y*10 <= 210):
+                    result[y].append("blue")
+                elif (500 <= x <= 510 and 200 <= y*10 <= 290):
+                    result[y].append("blue")
+                elif (500 <= x <= 600 and 280 <= y*10 <= 290):
+                    result[y].append("blue")
+                #bottom right outline
+                elif (500 <= x <= 600 and 350 <= y*10 <= 360):
+                    result[y].append("blue")
+                elif (500 <= x <= 510 and 350 <= y*10 <= 410):
+                    result[y].append("blue")
+                elif (500 <= x <= 560 and 400 <= y*10 <= 410):
+                    result[y].append("blue")
+                elif (560 <= x <= 570 and 400 <= y*10 <= 570):
+                    result[y].append("blue")
+                #bottom
+                elif (10 <= x <= 560 and 560 <= y*10 <= 570):
+                    result[y].append("blue")
+                #bottom left outline
+                elif (10 <= x <= 20 and 400 <= y*10 <= 570):
+                    result[y].append("blue")
+                elif (10 <= x <= 80 and 400 <= y*10 <= 410):
+                    result[y].append("blue")
+                elif (70 <= x <= 80 and 350 <= y*10 <= 410):
+                    result[y].append("blue")
+                elif (0 <= x <= 80 and 350 <= y*10 <= 360):
+                    result[y].append("blue")
+                #top left outline
+                elif (0 <= x <= 80 and 280 <= y*10 <= 290):
+                    result[y].append("blue")
+                elif (70 <= x <= 80 and 200 <= y*10 <= 290):
+                    result[y].append("blue")
+                elif (10 <= x <= 80 and 200 <= y*10 <= 210):
+                    result[y].append("blue")
+                elif (10 <= x <= 20 and 20 <= y*10 <= 210):
+                    result[y].append("blue")
+                else:
+                    result[y].append("black")
+        return result
+    if data.game2State:
+        for x in range(0,data.height,10):
+            for y in range(0,60):
+                #top
+                if (10 <= x <= 570 and 10 <= y*10 <= 20):
+                    result[y].append("blue")
+                #top left box
+                elif (80 <= x <= 140 and 80 <= y*10 <= 140):
+                    result[y].append("blue")
+                #top middle left box
+                elif (200 <= x <= 230 and 80 <= y*10 <= 220):
+                    result[y].append("blue")
+                #top middle middle box
+                elif (290 <= x <= 290 and 80 <= y*10 <= 220):
+                    result[y].append("blue")
+                #top middle right box
+                elif (350 <= x <= 380 and 80 <= y*10 <= 220):
+                    result[y].append("blue")
+                #top middle box
+                elif (140 <= x <= 440 and 200 <= y*10 <= 230):
+                    result[y].append("blue")
+                #top right box
+                elif (440 <= x <= 570 and 20 <= y*10 <= 140):
+                    result[y].append("blue")
+                #ghost home
+                elif (220 <= x <= 360 and 290 <= y*10 <= 380):
+                    result[y].append("cornflowerblue")
+                #topmiddle left box
+                elif (140 <= x <= 200 and 290 <= y*10 <= 380):
+                    result[y].append("blue")
+                #topmiddle right box
+                elif (380 <= x <= 450 and 290 <= y*10 <= 380):
+                    result[y].append("blue")
+                #middle left box
+                elif (170 <= x <= 300 and 440 <= y*10 <= 470):
+                    result[y].append("blue")
+                #middle right box
+                elif (300 <= x <= 410 and 440 <= y*10 <= 470):
+                    result[y].append("blue")
+                #bottom left box
+                elif (80 <= x <= 140 and 470 <= y*10 <= 500):
+                    result[y].append("blue")
+                #small bottom left box
+                elif (140 <= x <= 200 and 500 <= y*10 <= 500):
+                    result[y].append("blue")
+                #bottom right box
+                elif (440 <= x <= 500 and 470 <= y*10 <= 500):
+                    result[y].append("blue")
+                #small bottom right box
+                elif (380 <= x <= 440 and 500 <= y*10 <= 500):
+                    result[y].append("blue")
+                #bottom middle box
+                elif (260 <= x <= 320 and 500 <= y*10 <= 500):
+                    result[y].append("blue")
+                #top right outline
+                elif (560 <= x <= 570 and 20 <= y*10 <= 200):
+                    result[y].append("blue")
+                elif (500 <= x <= 570 and 200 <= y*10 <= 210):
+                    result[y].append("blue")
+                elif (500 <= x <= 510 and 200 <= y*10 <= 290):
+                    result[y].append("blue")
+                elif (500 <= x <= 600 and 280 <= y*10 <= 290):
+                    result[y].append("blue")
+                #bottom right outline
+                elif (500 <= x <= 600 and 350 <= y*10 <= 360):
+                    result[y].append("blue")
+                elif (500 <= x <= 510 and 350 <= y*10 <= 410):
+                    result[y].append("blue")
+                elif (500 <= x <= 560 and 400 <= y*10 <= 410):
+                    result[y].append("blue")
+                elif (560 <= x <= 570 and 400 <= y*10 <= 570):
+                    result[y].append("blue")
+                #bottom
+                elif (10 <= x <= 560 and 560 <= y*10 <= 570):
+                    result[y].append("blue")
+                #bottom left outline
+                elif (10 <= x <= 20 and 400 <= y*10 <= 570):
+                    result[y].append("blue")
+                elif (10 <= x <= 80 and 400 <= y*10 <= 410):
+                    result[y].append("blue")
+                elif (70 <= x <= 80 and 350 <= y*10 <= 410):
+                    result[y].append("blue")
+                elif (0 <= x <= 80 and 350 <= y*10 <= 360):
+                    result[y].append("blue")
+                #top left outline
+                elif (0 <= x <= 80 and 280 <= y*10 <= 290):
+                    result[y].append("blue")
+                elif (70 <= x <= 80 and 200 <= y*10 <= 290):
+                    result[y].append("blue")
+                elif (10 <= x <= 80 and 200 <= y*10 <= 210):
+                    result[y].append("blue")
+                elif (10 <= x <= 20 and 20 <= y*10 <= 210):
+                    result[y].append("blue")
+                else:
+                    result[y].append("black")
+        return result
           
 def validToMove(data):
     #avoids pacman from running into any walls
@@ -954,11 +1051,12 @@ def drawCoins(data):
     results[2][2]+=3
     results[2][1]-=3
     results[2][3]+=3
-    results[120][4]="red"
-    results[120][0]-=3
-    results[120][2]+=3
-    results[120][1]-=3
-    results[120][3]+=3
+    if data.gameState:
+        results[120][4]="red"
+        results[120][0]-=3
+        results[120][2]+=3
+        results[120][1]-=3
+        results[120][3]+=3
     results[50][4]="red"
     results[50][0]-=3
     results[50][2]+=3
@@ -1100,22 +1198,22 @@ def checkCollisions(data):
                 (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
                 ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
                     if count == 0:
-                        data.ghosts2[count][0] = 27
-                        data.ghosts2[count][1] = 29
+                        data.ghosts2[count][0] = 25
+                        data.ghosts2[count][1] = 31
                     if count == 1:
-                        data.ghosts2[count][0] = 27
-                        data.ghosts2[count][1] = 32
+                        data.ghosts2[count][0] = 29
+                        data.ghosts2[count][1] = 31
                     if count == 2:
-                        data.ghosts2[count][0] = 27
-                        data.ghosts2[count][1] = 35
+                        data.ghosts2[count][0] = 33
+                        data.ghosts2[count][1] = 31
                     if count == 3:
-                        data.ghosts2[count][0] = 31
-                        data.ghosts2[count][1] = 29
+                        data.ghosts2[count][0] = 25
+                        data.ghosts2[count][1] = 35
                     if count == 4:
-                        data.ghosts2[count][0] = 31
-                        data.ghosts2[count][1] = 32
+                        data.ghosts2[count][0] = 29
+                        data.ghosts2[count][1] = 35
                     if count == 5:
-                        data.ghosts2[count][0] = 31
+                        data.ghosts2[count][0] = 33
                         data.ghosts2[count][1] = 35
                     data.lives -= 1
                     if data.lives == 0:
