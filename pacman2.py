@@ -7,10 +7,10 @@ import socket
 from tkinter import *
 
 def init(data):
-    data.startState = False
+    data.startState = True
     data.instructionState = False
     data.gameState = False
-    data.game2State = True
+    data.game2State = False
     data.loseState = False
     data.winState = False
     data.timer = 200
@@ -47,6 +47,8 @@ def init(data):
     data.ghosts2 = [[27,29,"tomato"],[27,32,"deepskyblue"],[27,35,"magenta"],
     [31,29,"peru"],[31,32,"plum"],[31,35,"palegreen"]]
     data.directions = ["Right", "Left", "Up", "Down"]
+    data.ghostRowReset = None
+    data.ghostColReset = None
     data.ghost1Direction = None
     data.ghost2Direction = None
     data.ghost3Direction = None
@@ -61,6 +63,11 @@ def init(data):
 def mousePressed(event, data):
     x = event.x
     y = event.y
+    if data.startState:
+        if 240 <= x <= 360:
+            if 330 <= y <= 380:
+                data.startState = False
+                data.instructionState = True
     if data.instructionState:
         if 220 <= x <= 380:
             if 450 <= y <= 500:
@@ -70,10 +77,6 @@ def mousePressed(event, data):
         print(x,y)
 
 def keyPressed(event, data):
-    if data.startState:
-        if event.keysym == "b":
-            data.startState = False
-            data.instructionState = True
     if data.gameState or data.game2State:
         #changes the direction of pac man based on the key the user presses
         if event.keysym == "Right":
@@ -158,10 +161,12 @@ def keyPressed(event, data):
                         count += 1
     if data.loseState or data.winState:
         if event.keysym == "1":
-            data.winState = False
+            init(data)
+            data.startState = False
             data.gameState = True
         if event.keysym == "2":
-            data.winState = False
+            init(data)
+            data.startState = False
             data.game2State = True            
     
 def timerFired(data):
@@ -332,6 +337,12 @@ def timerFired(data):
             data.ghosts[0][2] = "tomato"
             data.ghosts[1][2] = "deepskyblue"
             data.ghosts[2][2] = "magenta"
+            data.ghosts2[0][2] = "tomato"
+            data.ghosts2[1][2] = "deepskyblue"
+            data.ghosts2[2][2] = "magenta"
+            data.ghosts2[3][2] = "peru"
+            data.ghosts2[4][2] = "plum"
+            data.ghosts2[5][2] = "palegreen"
             data.redCount = 0
         checkCollisions(data)
 
@@ -342,8 +353,10 @@ def redrawAll(canvas, data):
         #draws title and instructions to begin
         canvas.create_text(data.width//2,data.height//3,
         text="Welcome to Pac-Man",fill="plum",font="Arial 50 bold")
-        canvas.create_text(data.width//2,data.height//2+60,
-        text="Press 'b' to begin",fill="deepskyblue",font="Arial 32 bold")
+        canvas.create_rectangle(data.width//2-60,data.height//2+30,
+        data.width//2+60,data.height//2+70,fill="white")
+        canvas.create_text(data.width//2,data.height//2+50,
+        text="Begin",fill="black",font="Arial 32 bold")
         for circle in data.startCircles:
             canvas.create_oval(circle[0],circle[1],circle[2],circle[3],
             fill="yellow")
@@ -358,9 +371,18 @@ def redrawAll(canvas, data):
         #draws example of pac man moving across the screen
         canvas.create_oval(data.startCircle[0],data.startCircle[1],
         data.startCircle[2],data.startCircle[3],fill="yellow")
+        canvas.create_polygon(data.startCircle[2],data.startCircle[1],
+        data.startCircle[2]-30,data.startCircle[1]+30,data.startCircle[2],
+        data.startCircle[3],fill="black")
         #draws ghost following pacman
         canvas.create_oval(data.startGhost[0],data.startGhost[1],
         data.startGhost[2],data.startGhost[3],fill="deepskyblue")
+        canvas.create_oval(data.startGhost[0]+16,data.startGhost[1]+16,
+        data.startGhost[0]+22,data.startGhost[1]+22,fill="black")
+        canvas.create_oval(data.startGhost[0]+44,data.startGhost[1]+16,
+        data.startGhost[0]+38,data.startGhost[1]+22,fill="black")
+        canvas.create_rectangle(data.startGhost[0]+15,data.startGhost[1]+38,
+        data.startGhost[0]+45,data.startGhost[1]+41,fill="black")
         if data.startLost:
             canvas.create_text(data.width//2,data.height//2+70,text="YOU LOST",
             font="Arial 34 bold", fill="plum")
@@ -446,7 +468,9 @@ def redrawAll(canvas, data):
         canvas.create_text(data.width//2,data.height//3+85,
         text=scoreText,font="Arial 30",fill="yellow")
         canvas.create_text(data.width//2,data.height//3+135,
-        text="Press 'p' to play again",font="Arial 22",fill="plum")
+        text="Press '1' to play level 1",font="Arial 22",fill="plum")
+        canvas.create_text(data.width//2,data.height//3+165,
+        text="Press '2' to play level 2",font="Arial 22",fill="plum")
     if data.winState:
         scoreText = "Score: %d" % (data.score)
         canvas.create_text(data.width//2,data.height//3+35,text="YOU WON",
@@ -899,17 +923,17 @@ def moveGhost(data,num):
             #topRow = data.ghosts[num-1][1]
             #bottomRow = data.ghosts[num-1][1]+3
             if direction == "Right":
-                data.ghosts2[num-1][0] += 1
+                data.ghosts2[num-1][0] += 2
                 if data.ghosts2[num-1][1] == 32 and data.ghosts2[num-1][0]+3 > 59:
                     data.ghosts2[num-1][0] = 0
             if direction == "Left":
-                data.ghosts2[num-1][0] -= 1
+                data.ghosts2[num-1][0] -= 2
                 if data.ghosts2[num-1][1] == 32 and data.ghosts2[num-1][0] < 0:
                     data.ghosts2[num-1][0] = 56
             if direction == "Up":
-                data.ghosts2[num-1][1] -= 1
+                data.ghosts2[num-1][1] -= 2
             if direction == "Down":
-                data.ghosts2[num-1][1] += 1
+                data.ghosts2[num-1][1] += 2
         
 def drawCoins(data):
     results = []
@@ -984,8 +1008,17 @@ def checkCollisions(data):
                 ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
                 (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
                 ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
-                    data.ghosts[count][0] = 27
-                    data.ghosts[count][1] = 33
+                    if count == 0:
+                        data.ghostRowReset = 29
+                        data.ghostColReset = 30
+                    if count == 1:
+                        data.ghostRowReset = 27
+                        data.ghostColReset = 33
+                    if count == 2:
+                        data.ghostRowReset = 31
+                        data.ghostColReset = 33
+                    data.ghosts[count][0] = data.ghostRowReset
+                    data.ghosts[count][1] = data.ghostColReset
                     data.lives -= 1
                     if data.lives == 0:
                         data.gameState = False
@@ -1066,8 +1099,24 @@ def checkCollisions(data):
                 ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
                 (ghost[1] <= data.pacmanTopRow+1 <= ghost[1]+3 or \
                 ghost[1] <= data.pacmanBottomRow-1 <= ghost[1]+3):
-                    data.ghosts2[count][0] = 27
-                    data.ghosts2[count][1] = 33
+                    if count == 0:
+                        data.ghosts2[count][0] = 27
+                        data.ghosts2[count][1] = 29
+                    if count == 1:
+                        data.ghosts2[count][0] = 27
+                        data.ghosts2[count][1] = 32
+                    if count == 2:
+                        data.ghosts2[count][0] = 27
+                        data.ghosts2[count][1] = 35
+                    if count == 3:
+                        data.ghosts2[count][0] = 31
+                        data.ghosts2[count][1] = 29
+                    if count == 4:
+                        data.ghosts2[count][0] = 31
+                        data.ghosts2[count][1] = 32
+                    if count == 5:
+                        data.ghosts2[count][0] = 31
+                        data.ghosts2[count][1] = 35
                     data.lives -= 1
                     if data.lives == 0:
                         data.game2State = False
@@ -1077,8 +1126,8 @@ def checkCollisions(data):
             for ghost in data.ghosts2:
                 count += 1
                 if count == 0:
-                    row = 29
-                    col = 30
+                    row = 27
+                    col = 29
                     color = "tomato"
                     if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
                     ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
@@ -1099,7 +1148,7 @@ def checkCollisions(data):
                                 data.loseState = True
                 if count == 1:
                     row = 27
-                    col = 33
+                    col = 32
                     color = "deepskyblue"
                     if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
                     ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
@@ -1119,8 +1168,8 @@ def checkCollisions(data):
                                 data.game2State = False
                                 data.loseState = True
                 if count == 2:
-                    row = 31
-                    col = 33
+                    row = 27
+                    col = 35
                     color = "magenta"
                     if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
                     ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
@@ -1137,11 +1186,11 @@ def checkCollisions(data):
                             data.ghosts2[count][1] = col
                             data.lives -= 1
                             if data.lives == 0:
-                                data.gmae2State = False
+                                data.game2State = False
                                 data.loseState = True
                 if count == 3:
-                    row = 29
-                    col = 30
+                    row = 31
+                    col = 29
                     color = "peru"
                     if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
                     ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
@@ -1161,8 +1210,8 @@ def checkCollisions(data):
                                 data.game2State = False
                                 data.loseState = True
                 if count == 4:
-                    row = 27
-                    col = 33
+                    row = 31
+                    col = 32
                     color = "plum"
                     if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
                     ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
@@ -1183,7 +1232,7 @@ def checkCollisions(data):
                                 data.loseState = True
                 if count == 5:
                     row = 31
-                    col = 33
+                    col = 35
                     color = "palegreen"
                     if (ghost[0] <= data.pacmanLeftCol+1 <= ghost[0]+3 or \
                     ghost[0] <= data.pacmanRightCol-1 <= ghost[0]+3) and \
@@ -1200,7 +1249,7 @@ def checkCollisions(data):
                             data.ghosts2[count][1] = col
                             data.lives -= 1
                             if data.lives == 0:
-                                data.gmae2State = False
+                                data.game2State = False
                                 data.loseState = True
                     
 def getBestDirection(data,ghost):
