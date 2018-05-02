@@ -413,12 +413,17 @@ def redrawAll(canvas, data):
             fill="yellow")
     if data.instructionState:
         #draws instructions on how to place the game
-        canvas.create_text(data.width//2,data.height//4,
+        canvas.create_text(data.width//2,data.height//4-60,
         text="Use the arrow keys to move",font="Arial 28",fill="white")
-        canvas.create_text(data.width//2,data.height//4+32,
+        canvas.create_text(data.width//2,data.height//4-28,
         text="to collect the coins and avoid",font="Arial 28",fill="white")
-        canvas.create_text(data.width//2,data.height//4+64,
+        canvas.create_text(data.width//2,data.height//4+4,
         text="the ghosts.",font="Arial 28",fill="white")
+        canvas.create_text(data.width//2,data.height//4+40,
+        text="The red coins are power-ups and ",font="Arial 24",fill="white")
+        canvas.create_text(data.width//2,data.height//4+65,
+        text="allow Pac-Man to capture the ghosts.",font="Arial 24",
+        fill="white")
         #draws example of pac man moving across the screen
         canvas.create_oval(data.startCircle[0],data.startCircle[1],
         data.startCircle[2],data.startCircle[3],fill="yellow")
