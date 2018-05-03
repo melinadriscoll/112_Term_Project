@@ -244,7 +244,7 @@ def timerFired(data):
                     moveGhost(data,1)
                 #if best direction is not valid, choose second best direction
                 if valid == False:
-                    if data.count%5 == 0:
+                    if data.count%1 == 0:
                         direction = data.ghost1Direction
                         data.ghost1Direction = getBestDirection(data,1)[1]
                         #index = random.randint(0,len(data.directions)-1)
@@ -257,6 +257,11 @@ def timerFired(data):
                             valid = validGhostMove(data,1)
                             if valid:
                                 moveGhost(data,1)
+                            if valid == False:
+                                data.ghost1Direction = getBestDirection(data,1)[3]
+                                valid = validGhostMove(data,1)
+                                if valid:
+                                    moveGhost(data,1)
             #moves ghost two
             if data.count == 25 or \
             (data.count >= 25 and data.ghosts[1][0] == 27 and \
@@ -270,7 +275,7 @@ def timerFired(data):
                     moveGhost(data,2)
                 #if best direction is not valid, choose second best direction
                 if valid == False:
-                    if data.count%5 == 0:
+                    if data.count%1 == 0:
                         direction = data.ghost2Direction
                         data.ghost2Direction = getBestDirection(data,2)[1]
                         # index = random.randint(0,len(data.directions)-1)
@@ -278,6 +283,16 @@ def timerFired(data):
                         valid = validGhostMove(data,2)
                         if valid:
                             moveGhost(data,2)
+                        if valid == False:
+                            data.ghost2Direction = getBestDirection(data,2)[2]
+                            valid = validGhostMove(data,2)
+                            if valid:
+                                moveGhost(data,2)
+                            if valid == False:
+                                data.ghost2Direction = getBestDirection(data,2)[3]
+                                valid = validGhostMove(data,2)
+                                if valid:
+                                    moveGhost(data,2)
             #moves ghost three
             if data.count == 35 or \
             (data.count >= 35 and data.ghosts[2][0] == 31 and \
@@ -291,7 +306,7 @@ def timerFired(data):
                     moveGhost(data,3)
                 #if best direction is not valid, choose second best direction
                 if valid == False:
-                    if data.count%5 == 0:
+                    if data.count%1 == 0:
                         direction = data.ghost3Direction
                         data.ghost3Direction = getBestDirection(data,3)[1]
                         # index = random.randint(0,len(data.directions)-1)
@@ -299,6 +314,16 @@ def timerFired(data):
                         valid = validGhostMove(data,3)
                         if valid:
                             moveGhost(data,3)
+                        if valid == False:
+                            data.ghost3Direction = getBestDirection(data,3)[2]
+                            valid = validGhostMove(data,3)
+                            if valid:
+                                moveGhost(data,3)
+                            if valid == False:
+                                data.ghost3Direction = getBestDirection(data,3)[3]
+                                valid = validGhostMove(data,3)
+                                if valid:
+                                    moveGhost(data,3)
         if data.game2State:
             #moves ghost one
             if data.count == 5 or \
@@ -313,7 +338,7 @@ def timerFired(data):
                     moveGhost(data,1)
                 #if best direction is not valid, choose second best direction
                 if valid == False:
-                    if data.count%5 == 0:
+                    if data.count%1 == 0:
                         direction = data.ghost1Direction
                         data.ghost1Direction = getBestDirection(data,1)[1]
                         valid = validGhostMove(data,1)
@@ -324,6 +349,11 @@ def timerFired(data):
                             valid = validGhostMove(data,1)
                             if valid:
                                 moveGhost(data,1)
+                            if valid == False:
+                                data.ghost1Direction = getBestDirection(data,1)[3]
+                                valid = validGhostMove(data,1)
+                                if valid:
+                                    moveGhost(data,1)
             #moves ghost two
             if data.count == 15 or \
             (data.count >= 15 and data.ghosts2[1][0] == 29 and \
@@ -337,12 +367,22 @@ def timerFired(data):
                     moveGhost(data,2)
                 #if best direction is not valid, choose second best direction
                 if valid == False:
-                    if data.count%5 == 0:
+                    if data.count%1 == 0:
                         direction = data.ghost2Direction
                         data.ghost2Direction = getBestDirection(data,2)[1]
                         valid = validGhostMove(data,2)
                         if valid:
                             moveGhost(data,2)
+                        if valid == False:
+                            data.ghost2Direction = getBestDirection(data,2)[2]
+                            valid = validGhostMove(data,2)
+                            if valid:
+                                moveGhost(data,2)
+                            if valid == False:
+                                data.ghost2Direction = getBestDirection(data,2)[3]
+                                valid = validGhostMove(data,2)
+                                if valid:
+                                    moveGhost(data,2)
             #moves ghost three
             if data.count == 25 or \
             (data.count >= 25 and data.ghosts2[2][0] == 33 and \
@@ -356,12 +396,22 @@ def timerFired(data):
                     moveGhost(data,3)
                 #if best direction is not valid, choose second best direction
                 if valid == False:
-                    if data.count%5 == 0:
+                    if data.count%1 == 0:
                         direction = data.ghost3Direction
                         data.ghost3Direction = getBestDirection(data,3)[1]
                         valid = validGhostMove(data,3)
                         if valid:
                             moveGhost(data,3)
+                        if valid == False:
+                            data.ghost3Direction = getBestDirection(data,3)[2]
+                            valid = validGhostMove(data,3)
+                            if valid:
+                                moveGhost(data,3)
+                            if valid == False:
+                                data.ghost3Direction = getBestDirection(data,3)[3]
+                                valid = validGhostMove(data,3)
+                                if valid:
+                                    moveGhost(data,3)
             #move ghost four
             if data.count == 35 or \
             (data.count >= 35 and data.ghosts2[3][0] == 25 and \
@@ -375,12 +425,22 @@ def timerFired(data):
                     moveGhost(data,4)
                 #if best direction is not valid, choose second best direction
                 if valid == False:
-                    if data.count%5 == 0:
+                    if data.count%1 == 0:
                         direction = data.ghost4Direction
                         data.ghost4Direction = getBestDirection(data,4)[1]
                         valid = validGhostMove(data,4)
                         if valid:
                             moveGhost(data,4)
+                        if valid == False:
+                            data.ghost4Direction = getBestDirection(data,4)[2]
+                            valid = validGhostMove(data,4)
+                            if valid:
+                                moveGhost(data,4)
+                            if valid == False:
+                                data.ghost4Direction = getBestDirection(data,4)[3]
+                                valid = validGhostMove(data,4)
+                                if valid:
+                                    moveGhost(data,4)
             #move ghost five
             if data.count == 45 or \
             (data.count >= 45 and data.ghosts2[4][0] == 29 and \
@@ -394,12 +454,22 @@ def timerFired(data):
                     moveGhost(data,5)
                 #if best direction is not valid, choose second best direction
                 if valid == False:
-                    if data.count%5 == 0:
+                    if data.count%1 == 0:
                         direction = data.ghost5Direction
                         data.ghost5Direction = getBestDirection(data,5)[1]
                         valid = validGhostMove(data,5)
                         if valid:
                             moveGhost(data,5)
+                        if valid == False:
+                            data.ghost5Direction = getBestDirection(data,5)[2]
+                            valid = validGhostMove(data,5)
+                            if valid:
+                                moveGhost(data,5)
+                            if valid == False:
+                                data.ghost5Direction = getBestDirection(data,5)[3]
+                                valid = validGhostMove(data,5)
+                                if valid:
+                                    moveGhost(data,5)
             #move ghost six
             if data.count == 50 or \
             (data.count >= 50 and data.ghosts2[5][0] == 33 and \
@@ -413,12 +483,22 @@ def timerFired(data):
                     moveGhost(data,6)
                 #if best direction is not valid, choose second best direction
                 if valid == False:
-                    if data.count%5 == 0:
+                    if data.count%1 == 0:
                         direction = data.ghost6Direction
                         data.ghost6Direction = getBestDirection(data,6)[1]
                         valid = validGhostMove(data,6)
                         if valid:
                             moveGhost(data,6)
+                        if valid == False:
+                            data.ghost6Direction = getBestDirection(data,6)[2]
+                            valid = validGhostMove(data,6)
+                            if valid:
+                                moveGhost(data,6)
+                            if valid == False:
+                                data.ghost6Direction = getBestDirection(data,6)[3]
+                                valid = validGhostMove(data,6)
+                                if valid:
+                                    moveGhost(data,6)
         #if player has hit a special coin, receieves a power up to get more
         #points for colliding with the ghosts
         if data.switchRoles:
@@ -438,13 +518,19 @@ def timerFired(data):
                 if not(ghost in data.normalGhosts):
                     #ghosts flash when the power up is about to end
                     if data.redCount > 30 and data.redCount%2 == 0:
-                        data.ghosts[0][2] = "red"
-                        data.ghosts[1][2] = "red"
-                        data.ghosts[2][2] = "red"
+                        data.ghosts2[0][2] = "red"
+                        data.ghosts2[1][2] = "red"
+                        data.ghosts2[2][2] = "red"
+                        data.ghosts2[3][2] = "red"
+                        data.ghosts2[4][2] = "red"
+                        data.ghosts2[5][2] = "red"
                     if data.redCount > 30 and data.redCount%2 != 0:
-                        data.ghosts[0][2] = "white"
-                        data.ghosts[1][2] = "white"
-                        data.ghosts[2][2] = "white"
+                        data.ghosts2[0][2] = "white"
+                        data.ghosts2[1][2] = "white"
+                        data.ghosts2[2][2] = "white"
+                        data.ghosts2[3][2] = "white"
+                        data.ghosts2[4][2] = "white"
+                        data.ghosts2[5][2] = "white"
         #when powerup has ended, return game to normal
         if data.redCount == 40:
             data.coinsSpecial = []
@@ -1487,6 +1573,7 @@ def getBestDirection(data,ghost):
     bestDirection = None
     secondDirection = None
     thirdBest = None
+    fourthDirection = None
     if data.gameState:
         if ghost == 1:
             direction = data.ghost1Direction
@@ -1571,7 +1658,13 @@ def getBestDirection(data,ghost):
                         secondDirection = "Right"
                         thirdBest = "Left"
                 data.ghosts[ghost-1][1] -= 2
-        return [bestDirection,secondDirection,thirdBest]
+        for direction in data.directions:
+            if direction == bestDirection or direction == secondDirection or \
+            direction == thirdBest:
+                continue
+            else:
+                fourthDirection = direction
+        return [bestDirection,secondDirection,thirdBest,fourthDirection]
     if data.game2State:
         if ghost == 1:
             direction = data.ghost1Direction
@@ -1660,7 +1753,13 @@ def getBestDirection(data,ghost):
                         secondDirection = "Right"
                         thirdBest = "Left"
                 data.ghosts2[ghost-1][1] -= 2
-        return [bestDirection,secondDirection,thirdBest]
+        for direction in data.directions:
+            if direction == bestDirection or direction == secondDirection or \
+            direction == thirdBest:
+                continue
+            else:
+                fourthDirection = direction
+        return [bestDirection,secondDirection,thirdBest,fourthDirection]
     
 def ghostsCollide(data,num):
     if data.gameState:
