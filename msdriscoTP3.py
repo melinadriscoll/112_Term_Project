@@ -239,13 +239,15 @@ def timerFired(data):
             valid = validGhostMove(data,1)
             if (data.count >= 5):
                 if valid:
+                    print("VALID")
                     moveGhost(data,1)
                 #if best direction is not valid, choose random direction
                 if valid == False:
                     if data.count%5 == 0:
-                        #data.ghost1Direction = getSecondDirection(data,1)
-                        index = random.randint(0,len(data.directions)-1)
-                        data.ghost1Direction = data.directions[index]
+                        direction = data.ghost1Direction
+                        data.ghost1Direction = getSecondDirection(data,1,direction)
+                        # index = random.randint(0,len(data.directions)-1)
+                        # data.ghost1Direction = data.directions[index]
                         valid = validGhostMove(data,1)
                         if valid:
                             moveGhost(data,1)
@@ -257,13 +259,15 @@ def timerFired(data):
             if (data.count >= 25):
                 valid = validGhostMove(data,2)
                 if valid:
+                    print("VALID")
                     moveGhost(data,2)
                 #if best direction is not valid, choose random direction
                 if valid == False:
                     if data.count%5 == 0:
-                        #data.ghost2Direction = getSecondDirection(data,2)
-                        index = random.randint(0,len(data.directions)-1)
-                        data.ghost2Direction = data.directions[index]
+                        direction = data.ghost2Direction
+                        data.ghost2Direction = getSecondDirection(data,2,direction)
+                        # index = random.randint(0,len(data.directions)-1)
+                        # data.ghost2Direction = data.directions[index]
                         valid = validGhostMove(data,2)
                         if valid:
                             moveGhost(data,2)
@@ -275,13 +279,15 @@ def timerFired(data):
             if (data.count >= 35):
                 valid = validGhostMove(data,3)
                 if valid:
+                    print("VALID")
                     moveGhost(data,3)
                 #if best direction is not valid, choose random direction
                 if valid == False:
                     if data.count%5 == 0:
-                        #data.ghost3Direction = getSecondDirection(data,3)
-                        index = random.randint(0,len(data.directions)-1)
-                        data.ghost3Direction = data.directions[index]
+                        direction = data.ghost3Direction
+                        data.ghost3Direction = getSecondDirection(data,3,direction)
+                        # index = random.randint(0,len(data.directions)-1)
+                        # data.ghost3Direction = data.directions[index]
                         valid = validGhostMove(data,3)
                         if valid:
                             moveGhost(data,3)
@@ -1562,6 +1568,148 @@ def getBestDirection(data,ghost):
                     bestDistance = distance
                     bestDirection = "Down"
         return bestDirection
+        
+def getSecondDirection(data,ghost,oldDirection):
+    bestDistance = 10000
+    bestDirection = None
+    if data.gameState:
+        if ghost == 1:
+            direction = data.ghost1Direction
+        if ghost == 2:
+            direction = data.ghost2Direction
+        if ghost == 3:
+            direction = data.ghost3Direction
+        for direction in data.directions:
+            if direction == oldDirection:
+                continue
+            else:
+                if direction == "Left":
+                    data.ghosts[ghost-1][0] -= 2
+                    distanceCols = math.fabs(data.pacmanLeftCol - \
+                    data.ghosts[ghost-1][0])
+                    distanceRows = math.fabs(data.pacmanTopRow - \
+                    data.ghosts[ghost-1][1])
+                    distance = distanceCols + distanceRows
+                    data.ghosts[ghost-1][0] += 2
+                    if distance < bestDistance:
+                        bestDistance = distance
+                        bestDirection = "Left"
+                    data.ghosts[ghost-1][0] += 2
+                if direction == "Right":
+                    data.ghosts[ghost-1][0] += 2
+                    distanceCols = math.fabs(data.pacmanLeftCol - \
+                    data.ghosts[ghost-1][0])
+                    distanceRows = math.fabs(data.pacmanTopRow - \
+                    data.ghosts[ghost-1][1])
+                    distance = distanceCols + distanceRows
+                    data.ghosts[ghost-1][0] -= 2
+                    if distance < bestDistance:
+                        bestDistance = distance
+                        bestDirection = "Right"
+                    data.ghosts[ghost-1][0] -= 2
+                if direction == "Up":
+                    data.ghosts[ghost-1][1] -= 2
+                    distanceCols = math.fabs(data.pacmanLeftCol - \
+                    data.ghosts[ghost-1][0])
+                    distanceRows = math.fabs(data.pacmanTopRow - \
+                    data.ghosts[ghost-1][1])
+                    distance = distanceCols + distanceRows
+                    data.ghosts[ghost-1][1] += 2
+                    if distance < bestDistance:
+                        if direction == "Left":
+                            data.ghosts[num-1][0] -= 2
+                        if direction == "Right":
+                            data.ghosts[num-1][0] += 2
+                        bestDistance = distance
+                        bestDirection = "Up"
+                    data.ghosts[ghost-1][1] += 2
+                if direction == "Down":
+                    data.ghosts[ghost-1][1] += 2
+                    distanceCols = math.fabs(data.pacmanLeftCol - \
+                    data.ghosts[ghost-1][0])
+                    distanceRows = math.fabs(data.pacmanTopRow - \
+                    data.ghosts[ghost-1][1])
+                    distance = distanceCols + distanceRows
+                    data.ghosts[ghost-1][1] -= 2
+                    if distance < bestDistance:
+                        if direction == "Left":
+                            data.ghosts[num-1][0] -= 2
+                        if direction == "Right":
+                            data.ghosts[num-1][0] += 2
+                        bestDistance = distance
+                        bestDirection = "Down"
+                    data.ghosts[ghost-1][1] -= 2
+            return bestDirection
+    if data.game2State:
+        if ghost == 1:
+            direction = data.ghost1Direction
+        if ghost == 2:
+            direction = data.ghost2Direction
+        if ghost == 3:
+            direction = data.ghost3Direction
+        if ghost == 4:
+            direction = data.ghost4Direction
+        if ghost == 5:
+            direction = data.ghost5Direction
+        if ghost == 6:
+            direction = data.ghost6Direction
+            for direction in data.directions:
+                if direction == oldDirection:
+                    continue
+                else:
+                    if direction == "Left":
+                        data.ghosts2[ghost-1][0] -= 2
+                        distanceCols = math.fabs(data.pacmanLeftCol - \
+                        data.ghosts2[ghost-1][0])
+                        distanceRows = math.fabs(data.pacmanTopRow - \
+                        data.ghosts2[ghost-1][1])
+                        distance = distanceCols + distanceRows
+                        data.ghosts2[ghost-1][0] += 2
+                        if distance < bestDistance:
+                            bestDistance = distance
+                            bestDirection = "Left"
+                    if direction == "Right":
+                        data.ghosts2[ghost-1][0] += 2
+                        distanceCols = math.fabs(data.pacmanLeftCol - \
+                        data.ghosts2[ghost-1][0])
+                        distanceRows = math.fabs(data.pacmanTopRow - \
+                        data.ghosts2[ghost-1][1])
+                        distance = distanceCols + distanceRows
+                        data.ghosts2[ghost-1][0] -= 2
+                        if distance < bestDistance:
+                            bestDistance = distance
+                            bestDirection = "Right"
+                    if direction == "Up":
+                        data.ghosts2[ghost-1][1] -= 2
+                        distanceCols = math.fabs(data.pacmanLeftCol - \
+                        data.ghosts2[ghost-1][0])
+                        distanceRows = math.fabs(data.pacmanTopRow - \
+                        data.ghosts2[ghost-1][1])
+                        distance = distanceCols + distanceRows
+                        data.ghosts2[ghost-1][1] += 2
+                        if distance < bestDistance:
+                            if direction == "Left":
+                                data.ghosts2[num-1][0] -= 2
+                            if direction == "Right":
+                                data.ghosts2[num-1][0] += 2
+                            bestDistance = distance
+                            bestDirection = "Up"
+                    if direction == "Down":
+                        data.ghosts2[ghost-1][1] += 2
+                        distanceCols = math.fabs(data.pacmanLeftCol - \
+                        data.ghosts2[ghost-1][0])
+                        distanceRows = math.fabs(data.pacmanTopRow - \
+                        data.ghosts2[ghost-1][1])
+                        distance = distanceCols + distanceRows
+                        data.ghosts2[ghost-1][1] -= 2
+                        if distance < bestDistance:
+                            if direction == "Left":
+                                data.ghosts2[num-1][0] -= 2
+                            if direction == "Right":
+                                data.ghosts2[num-1][0] += 2
+                            bestDistance = distance
+                            bestDirection = "Down"
+                return bestDirection
     
 def ghostsCollide(data,num):
     if data.gameState:
