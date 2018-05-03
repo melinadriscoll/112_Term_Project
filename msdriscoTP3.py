@@ -258,7 +258,7 @@ def timerFired(data):
                             if valid:
                                 moveGhost(data,1)
                             if valid == False:
-                                data.ghost1Direction = getBestDirection(data,1)[3]
+                                data.ghost1Direction=getBestDirection(data,1)[3]
                                 valid = validGhostMove(data,1)
                                 if valid:
                                     moveGhost(data,1)
@@ -289,7 +289,7 @@ def timerFired(data):
                             if valid:
                                 moveGhost(data,2)
                             if valid == False:
-                                data.ghost2Direction = getBestDirection(data,2)[3]
+                                data.ghost2Direction=getBestDirection(data,2)[3]
                                 valid = validGhostMove(data,2)
                                 if valid:
                                     moveGhost(data,2)
@@ -320,7 +320,7 @@ def timerFired(data):
                             if valid:
                                 moveGhost(data,3)
                             if valid == False:
-                                data.ghost3Direction = getBestDirection(data,3)[3]
+                                data.ghost3Direction=getBestDirection(data,3)[3]
                                 valid = validGhostMove(data,3)
                                 if valid:
                                     moveGhost(data,3)
@@ -350,7 +350,7 @@ def timerFired(data):
                             if valid:
                                 moveGhost(data,1)
                             if valid == False:
-                                data.ghost1Direction = getBestDirection(data,1)[3]
+                                data.ghost1Direction=getBestDirection(data,1)[3]
                                 valid = validGhostMove(data,1)
                                 if valid:
                                     moveGhost(data,1)
@@ -379,7 +379,7 @@ def timerFired(data):
                             if valid:
                                 moveGhost(data,2)
                             if valid == False:
-                                data.ghost2Direction = getBestDirection(data,2)[3]
+                                data.ghost2Direction=getBestDirection(data,2)[3]
                                 valid = validGhostMove(data,2)
                                 if valid:
                                     moveGhost(data,2)
@@ -408,7 +408,7 @@ def timerFired(data):
                             if valid:
                                 moveGhost(data,3)
                             if valid == False:
-                                data.ghost3Direction = getBestDirection(data,3)[3]
+                                data.ghost3Direction=getBestDirection(data,3)[3]
                                 valid = validGhostMove(data,3)
                                 if valid:
                                     moveGhost(data,3)
@@ -437,7 +437,7 @@ def timerFired(data):
                             if valid:
                                 moveGhost(data,4)
                             if valid == False:
-                                data.ghost4Direction = getBestDirection(data,4)[3]
+                                data.ghost4Direction=getBestDirection(data,4)[3]
                                 valid = validGhostMove(data,4)
                                 if valid:
                                     moveGhost(data,4)
@@ -466,7 +466,7 @@ def timerFired(data):
                             if valid:
                                 moveGhost(data,5)
                             if valid == False:
-                                data.ghost5Direction = getBestDirection(data,5)[3]
+                                data.ghost5Direction=getBestDirection(data,5)[3]
                                 valid = validGhostMove(data,5)
                                 if valid:
                                     moveGhost(data,5)
@@ -495,7 +495,7 @@ def timerFired(data):
                             if valid:
                                 moveGhost(data,6)
                             if valid == False:
-                                data.ghost6Direction = getBestDirection(data,6)[3]
+                                data.ghost6Direction=getBestDirection(data,6)[3]
                                 valid = validGhostMove(data,6)
                                 if valid:
                                     moveGhost(data,6)
@@ -596,8 +596,8 @@ def redrawAll(canvas, data):
             font="Arial 34 bold", fill="plum")
         #draws the button to continue to the game
         canvas.create_rectangle(220,450,380,500,fill="white")
-        canvas.create_text(data.width//2,475,text="Continue",font="Arial 28 bold",
-        fill="black")
+        canvas.create_text(data.width//2,475,text="Continue",
+        font="Arial 28 bold",fill="black")
     if data.gameState or data.game2State:
         #draws board
         for x in range(0,data.height,10):
@@ -645,9 +645,10 @@ def redrawAll(canvas, data):
             data.pacmanRightCol*10-15,data.pacmanBottomRow*10-15,
             data.pacmanRightCol*10,data.pacmanTopRow*10,fill="black")
         if data.pacmanDirection == "Down":
-            canvas.create_polygon(data.pacmanLeftCol*10, data.pacmanBottomRow*10,
-            data.pacmanLeftCol*10+15,data.pacmanBottomRow*10-15,
-            data.pacmanRightCol*10,data.pacmanBottomRow*10,fill="black")
+            canvas.create_polygon(data.pacmanLeftCol*10, 
+            data.pacmanBottomRow*10,data.pacmanLeftCol*10+15,
+            data.pacmanBottomRow*10-15,data.pacmanRightCol*10,
+            data.pacmanBottomRow*10,fill="black")
         #draws ghosts
         if data.gameState:
             for ghost in data.ghosts:
@@ -1049,7 +1050,8 @@ def validGhostMove(data,num):
                 data.ghosts[num-1][0] += 1
                 return False
             if ghostsCollide(data,num) == None:
-                if 31 <= data.ghosts[num-1][1] <= 34 and data.ghosts[num-1][0] < 0:
+                if 31 <= data.ghosts[num-1][1] <= 34 and \
+                data.ghosts[num-1][0] < 0:
                     data.ghosts[num-1][0] = 56
                 else:
                     #if the cell to the left is black, is valid to move
@@ -1237,7 +1239,8 @@ def moveGhost(data,num):
             #bottomRow = data.ghosts[num-1][1]+3
             if direction == "Right":
                 data.ghosts2[num-1][0] += 2
-                if data.ghosts2[num-1][1] == 32 and data.ghosts2[num-1][0]+3 > 59:
+                if data.ghosts2[num-1][1] == 32 and \
+                data.ghosts2[num-1][0]+3 > 59:
                     data.ghosts2[num-1][0] = 0
             if direction == "Left":
                 data.ghosts2[num-1][0] -= 2
@@ -1594,7 +1597,8 @@ def getBestDirection(data,ghost):
                     bestDistance = distance
                     bestDirection = "Left"
                 else:
-                    if distance < secondBestDistance and bestDistance != "Right":
+                    if distance < secondBestDistance and \
+                    bestDistance != "Right":
                         secondBestDistance = distance
                         secondDirection = "Left"
                         thirdBest = "Right"
@@ -1691,7 +1695,8 @@ def getBestDirection(data,ghost):
                     bestDistance = distance
                     bestDirection = "Left"
                 else:
-                    if distance < secondBestDistance and bestDistance != "Right":
+                    if distance < secondBestDistance and \
+                    bestDistance != "Right":
                         secondBestDistance = distance
                         secondDirection = "Left"
                         thirdBest = "Right"
@@ -1707,7 +1712,8 @@ def getBestDirection(data,ghost):
                     bestDistance = distance
                     bestDirection = "Right"
                 else:
-                    if distance < secondBestDistance and bestDistance != "Left":
+                    if distance < secondBestDistance and \
+                    bestDistance != "Left":
                         secondBestDistance = distance
                         secondDirection = "Right"
                         thirdBest = "Left"
